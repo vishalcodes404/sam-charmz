@@ -53,14 +53,14 @@ const Testimonials = () => {
                 <div className="max-w-4xl mx-auto relative">
                     <button
                         onClick={prev}
-                        className="absolute left-0 top-1/2 -translate-y-1/2 p-2 hover:bg-gray-50 rounded-full transition-colors hidden md:block"
+                        className="absolute left-0 top-1/2 -translate-y-1/2 p-2 hover:bg-gray-50 rounded-full transition-colors block"
                     >
                         <ChevronLeft className="w-6 h-6" />
                     </button>
 
                     <button
                         onClick={next}
-                        className="absolute right-0 top-1/2 -translate-y-1/2 p-2 hover:bg-gray-50 rounded-full transition-colors hidden md:block"
+                        className="absolute right-0 top-1/2 -translate-y-1/2 p-2 hover:bg-gray-50 rounded-full transition-colors block"
                     >
                         <ChevronRight className="w-6 h-6" />
                     </button>

@@ -35,7 +35,7 @@ const Navbar = ({ cartCount, wishlistCount, user, onSearch, onWishlistClick, onC
                     {/* Logo */}
                     <div className={`flex items-center gap-2 transition-opacity duration-300 ${isSearchOpen ? 'opacity-0 lg:opacity-100' : 'opacity-100'}`}>
                         <img src="/logo.jpg" alt="Sam Charmz" className="h-12 w-auto object-contain cursor-pointer" onClick={onLogoClick} />
-                        <button onClick={onLogoClick} className="text-2xl font-serif italic font-bold tracking-tighter hidden md:block">
+                        <button onClick={onLogoClick} className="text-xl md:text-2xl font-serif italic font-bold tracking-tighter block">
                             Sam Charmz
                         </button>
                     </div>
@@ -47,7 +47,7 @@ const Navbar = ({ cartCount, wishlistCount, user, onSearch, onWishlistClick, onC
                             className="relative group py-1 bg-transparent border-none cursor-pointer"
                         >
                             HOME
-                            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full"></span>
+                            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-brand-dark transition-all duration-300 group-hover:w-full"></span>
                         </button>
 
                         <button
@@ -55,7 +55,7 @@ const Navbar = ({ cartCount, wishlistCount, user, onSearch, onWishlistClick, onC
                             className="relative group py-1 bg-transparent border-none cursor-pointer"
                         >
                             NEW ARRIVALS
-                            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full"></span>
+                            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-brand-dark transition-all duration-300 group-hover:w-full"></span>
                         </button>
 
                         <button
@@ -63,7 +63,7 @@ const Navbar = ({ cartCount, wishlistCount, user, onSearch, onWishlistClick, onC
                             className="relative group py-1 bg-transparent border-none cursor-pointer"
                         >
                             SHOP
-                            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full"></span>
+                            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-brand-dark transition-all duration-300 group-hover:w-full"></span>
                         </button>
 
                         <a
@@ -81,7 +81,7 @@ const Navbar = ({ cartCount, wishlistCount, user, onSearch, onWishlistClick, onC
                             className="relative group py-1"
                         >
                             STORY
-                            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full"></span>
+                            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-brand-dark transition-all duration-300 group-hover:w-full"></span>
                         </a>
 
                         <a
@@ -89,7 +89,7 @@ const Navbar = ({ cartCount, wishlistCount, user, onSearch, onWishlistClick, onC
                             className="relative group py-1"
                         >
                             CONTACT
-                            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full"></span>
+                            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-brand-dark transition-all duration-300 group-hover:w-full"></span>
                         </a>
                     </div>
 
@@ -99,7 +99,7 @@ const Navbar = ({ cartCount, wishlistCount, user, onSearch, onWishlistClick, onC
                             <input
                                 type="text"
                                 placeholder="Search for jewelry..."
-                                className="w-full border-b border-black py-2 pl-2 pr-10 bg-transparent outline-none font-sans text-sm placeholder-gray-500"
+                                className="w-full border-b border-brand-dark py-2 pl-2 pr-10 bg-transparent outline-none font-sans text-sm placeholder-gray-500"
                                 onChange={(e) => onSearch(e.target.value)}
                                 autoFocus={isSearchOpen}
                             />
@@ -123,17 +123,17 @@ const Navbar = ({ cartCount, wishlistCount, user, onSearch, onWishlistClick, onC
 
                         <button
                             onClick={onUserClick}
-                            className="hidden lg:flex items-center gap-2 hover:opacity-70 transition-opacity"
+                            className="flex items-center gap-2 hover:opacity-70 transition-opacity"
                         >
                             <User className="w-5 h-5 stroke-[1.5]" />
                             {user && (
-                                <span className="text-sm font-medium">Hi, {user.firstName}</span>
+                                <span className="text-sm font-medium hidden lg:block">Hi, {user.firstName}</span>
                             )}
                         </button>
 
                         <button
                             onClick={onWishlistClick}
-                            className="hidden lg:block hover:opacity-70 transition-opacity relative"
+                            className="block hover:opacity-70 transition-opacity relative"
                         >
                             <Heart className="w-5 h-5 stroke-[1.5]" />
                             {wishlistCount > 0 && (
@@ -147,7 +147,7 @@ const Navbar = ({ cartCount, wishlistCount, user, onSearch, onWishlistClick, onC
                             className="relative hover:opacity-70 transition-opacity"
                         >
                             <ShoppingBag className="w-5 h-5 stroke-[1.5]" />
-                            <span className="absolute -top-2 -right-2 bg-brand-dark text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
+                            <span className="absolute -top-2 -right-2 bg-brand-dark text-brand-gold text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
                                 {cartCount}
                             </span>
                         </button>

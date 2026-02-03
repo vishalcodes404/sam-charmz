@@ -43,8 +43,8 @@ const ProductCard = ({ product, addToCart, isWishlisted, toggleWishlist, onProdu
                     />
                 </button>
 
-                {/* Quick Add Button - Slide up on hover */}
-                <div className="absolute bottom-0 left-0 right-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300 border-t border-gray-100 flex items-center justify-center py-3">
+                {/* Quick Add Button - Slide up on hover for desktop, always visible for mobile */}
+                <div className="absolute bottom-0 left-0 right-0 bg-white translate-y-0 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-300 border-t border-gray-100 flex items-center justify-center py-3">
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
@@ -58,9 +58,9 @@ const ProductCard = ({ product, addToCart, isWishlisted, toggleWishlist, onProdu
                             <><Plus className="w-4 h-4" /> Quick Add</>
                         )}
                     </button>
-                    {/* Add to Cart text inside image area as requested */}
-                    <div className="absolute bottom-16 left-0 right-0 text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                        <span className="bg-black/70 text-white px-3 py-1 text-xs uppercase tracking-wider backdrop-blur-sm rounded-full">
+                    {/* Add to Cart text inside image area as requested - Hidden on mobile, visible on desktop hover */}
+                    <div className="hidden md:block absolute bottom-16 left-0 right-0 text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                        <span className="bg-brand-dark/95 text-white px-3 py-1 text-xs uppercase tracking-wider backdrop-blur-sm rounded-full">
                             Add to Cart
                         </span>
                     </div>
@@ -117,8 +117,8 @@ const ProductGrid = ({ addToCart, products, wishlist, toggleWishlist, isSearchin
                                         key={cat}
                                         onClick={() => setActiveCategory(cat)}
                                         className={`pb-1 border-b-2 transition-colors duration-300 ${activeCategory === cat
-                                            ? 'border-black text-black'
-                                            : 'border-transparent text-gray-400 hover:text-black'
+                                            ? 'border-brand-dark text-brand-dark'
+                                            : 'border-transparent text-gray-400 hover:text-brand-dark'
                                             }`}
                                     >
                                         {cat}
@@ -160,7 +160,7 @@ const ProductGrid = ({ addToCart, products, wishlist, toggleWishlist, isSearchin
                 {sortedProducts.length > 0 ? (
                     <motion.div
                         layout
-                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12"
+                        className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8 md:gap-x-8 md:gap-y-12"
                     >
                         <AnimatePresence>
                             {sortedProducts.map((product) => (
@@ -190,7 +190,7 @@ const ProductGrid = ({ addToCart, products, wishlist, toggleWishlist, isSearchin
                 <div className="text-center mt-16">
                     <button
                         onClick={onViewAll}
-                        className="border border-black px-12 py-3 uppercase text-sm tracking-widest hover:bg-black hover:text-white transition-colors duration-300 bg-transparent"
+                        className="border border-brand-dark px-12 py-3 uppercase text-sm tracking-widest hover:bg-brand-dark hover:text-white transition-colors duration-300 bg-transparent text-brand-dark"
                     >
                         View All Products
                     </button>

@@ -12,8 +12,8 @@ export default {
             },
             colors: {
                 brand: {
-                    dark: '#1a1a1a',
-                    gold: '#C5A065', // Muted gold from logo style often used in luxury
+                    dark: '#0f172a', // Royal Navy
+                    gold: '#fb7185', // Rose Gold
                 }
             },
             animation: {

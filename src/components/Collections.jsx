@@ -22,7 +22,7 @@ const Collections = ({ onCategoryClick }) => {
             <div className="container mx-auto px-6">
                 <div className="text-center mb-16">
                     <h2 className="font-serif text-4xl mb-4 italic">Shop by Category</h2>
-                    <div className="w-16 h-[1px] bg-black mx-auto"></div>
+                    <div className="w-16 h-[1px] bg-brand-dark mx-auto"></div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
@@ -43,10 +43,10 @@ const Collections = ({ onCategoryClick }) => {
                             />
                             <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300" />
                             <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-4 text-center">
-                                <h3 className="font-serif text-2xl italic mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                                <h3 className="font-serif text-2xl italic mb-2 translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 transition-transform duration-500">
                                     {category.name}
                                 </h3>
-                                <p className="font-sans text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-100">
+                                <p className="font-sans text-xs tracking-widest uppercase opacity-100 md:opacity-0 md:group-hover:opacity-100 translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 transition-all duration-500 delay-100">
                                     {category.description}
                                 </p>
                             </div>
