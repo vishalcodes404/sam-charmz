@@ -68,8 +68,8 @@ const ProductCard = ({ product, addToCart, isWishlisted, toggleWishlist, onProdu
             </div>
 
             <div className="text-center">
-                <h3 className="font-serif text-lg mb-1">{product.name}</h3>
-                <p className="font-sans text-sm text-gray-500">{product.price}</p>
+                <h3 className="font-serif text-lg mb-1 dark:text-brand-light">{product.name}</h3>
+                <p className="font-sans text-sm text-gray-500 dark:text-gray-400">{product.price}</p>
             </div>
         </motion.div>
     );
@@ -103,10 +103,10 @@ const ProductGrid = ({ addToCart, products, wishlist, toggleWishlist, isSearchin
         <section id="products" className="py-20 px-6 backdrop-blur-sm">
             <div className="container mx-auto">
                 <div className="text-center mb-12">
-                    <h2 className="font-serif text-4xl mb-4 italic">
+                    <h2 className="font-serif text-4xl mb-4 italic dark:text-brand-gold">
                         {isSearching ? 'Search Results' : 'Latest Arrivals'}
                     </h2>
-                    <div className="w-16 h-[1px] bg-black mx-auto mb-8"></div>
+                    <div className="w-16 h-[1px] bg-brand-dark dark:bg-brand-gold mx-auto mb-8"></div>
 
                     <div className="flex flex-col md:flex-row justify-center items-center gap-8 relative">
                         {/* Category Filter - Hide if searching */}
@@ -117,8 +117,8 @@ const ProductGrid = ({ addToCart, products, wishlist, toggleWishlist, isSearchin
                                         key={cat}
                                         onClick={() => setActiveCategory(cat)}
                                         className={`pb-1 border-b-2 transition-colors duration-300 ${activeCategory === cat
-                                            ? 'border-brand-dark text-brand-dark'
-                                            : 'border-transparent text-gray-400 hover:text-brand-dark'
+                                            ? 'border-brand-dark text-brand-dark dark:border-brand-gold dark:text-brand-gold'
+                                            : 'border-transparent text-gray-400 hover:text-brand-dark dark:hover:text-white'
                                             }`}
                                     >
                                         {cat}
@@ -160,6 +160,18 @@ const ProductGrid = ({ addToCart, products, wishlist, toggleWishlist, isSearchin
                 {sortedProducts.length > 0 ? (
                     <motion.div
                         layout
+                        initial="hidden"
+                        whileInView="show"
+                        viewport={{ once: true }}
+                        variants={{
+                            hidden: { opacity: 0 },
+                            show: {
+                                opacity: 1,
+                                transition: {
+                                    staggerChildren: 0.1
+                                }
+                            }
+                        }}
                         className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8 md:gap-x-8 md:gap-y-12"
                     >
                         <AnimatePresence>
@@ -190,7 +202,7 @@ const ProductGrid = ({ addToCart, products, wishlist, toggleWishlist, isSearchin
                 <div className="text-center mt-16">
                     <button
                         onClick={onViewAll}
-                        className="border border-brand-dark px-12 py-3 uppercase text-sm tracking-widest hover:bg-brand-dark hover:text-white transition-colors duration-300 bg-transparent text-brand-dark"
+                        className="border border-brand-dark dark:border-brand-gold px-12 py-3 uppercase text-sm tracking-widest hover:bg-brand-dark hover:text-brand-gold dark:hover:bg-brand-gold dark:hover:text-brand-dark transition-colors duration-300 bg-transparent text-brand-dark dark:text-brand-gold"
                     >
                         View All Products
                     </button>

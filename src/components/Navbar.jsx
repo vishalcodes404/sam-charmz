@@ -20,13 +20,15 @@ const Navbar = ({ cartCount, wishlistCount, user, onSearch, onWishlistClick, onC
             <motion.nav
                 initial={{ y: -100 }}
                 animate={{ y: 0 }}
-                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/10 backdrop-blur-md shadow-sm border-b border-white/20 py-4' : 'bg-transparent py-6'
+                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
+                    ? 'bg-white/80 dark:bg-brand-dark/90 backdrop-blur-md shadow-sm border-b border-gray-200 dark:border-white/10 py-4'
+                    : 'bg-transparent py-6'
                     }`}
             >
                 <div className="container mx-auto px-6 flex justify-between items-center relative">
                     {/* Mobile Menu Button */}
                     <button
-                        className="lg:hidden text-brand-dark"
+                        className="lg:hidden text-brand-light"
                         onClick={() => setIsMobileMenuOpen(true)}
                     >
                         <Menu className="w-6 h-6" />
@@ -35,7 +37,7 @@ const Navbar = ({ cartCount, wishlistCount, user, onSearch, onWishlistClick, onC
                     {/* Logo */}
                     <div className={`flex items-center gap-2 transition-opacity duration-300 ${isSearchOpen ? 'opacity-0 lg:opacity-100' : 'opacity-100'}`}>
                         <img src="/logo.jpg" alt="Sam Charmz" className="h-12 w-auto object-contain cursor-pointer" onClick={onLogoClick} />
-                        <button onClick={onLogoClick} className="text-xl md:text-2xl font-serif italic font-bold tracking-tighter block">
+                        <button onClick={onLogoClick} className="text-xl md:text-2xl font-serif italic font-bold tracking-tighter block text-brand-light">
                             Sam Charmz
                         </button>
                     </div>
@@ -47,7 +49,7 @@ const Navbar = ({ cartCount, wishlistCount, user, onSearch, onWishlistClick, onC
                             className="relative group py-1 bg-transparent border-none cursor-pointer"
                         >
                             HOME
-                            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-brand-dark transition-all duration-300 group-hover:w-full"></span>
+                            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-300 group-hover:w-full"></span>
                         </button>
 
                         <button
@@ -113,7 +115,7 @@ const Navbar = ({ cartCount, wishlistCount, user, onSearch, onWishlistClick, onC
                     </div>
 
                     {/* Icons */}
-                    <div className="flex items-center gap-6 z-10">
+                    <div className="flex items-center gap-6 z-10 text-brand-light">
                         <button
                             onClick={() => setIsSearchOpen(!isSearchOpen)}
                             className="hover:opacity-70 transition-opacity"

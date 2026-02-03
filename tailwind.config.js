@@ -1,4 +1,3 @@
-/** @type {import('tailwindcss').Config} */
 export default {
     content: [
         "./index.html",
@@ -12,8 +11,9 @@ export default {
             },
             colors: {
                 brand: {
-                    dark: '#0f172a', // Royal Navy
-                    gold: '#fb7185', // Rose Gold
+                    dark: '#020617', // Deepest Navy
+                    gold: '#2dd4bf', // Teal/Cyan Accent (replacing gold for this theme)
+                    light: '#f1f5f9', // Light Slate text
                 }
             },
             animation: {

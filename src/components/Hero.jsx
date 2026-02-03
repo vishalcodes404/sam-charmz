@@ -49,7 +49,7 @@ const Hero = ({ onShopClick }) => {
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.9, duration: 0.8 }}
                     onClick={onShopClick}
-                    className="border border-white px-8 py-3 text-sm uppercase tracking-widest hover:bg-white hover:text-black transition-colors duration-300 backdrop-blur-sm"
+                    className="border border-white px-8 py-3 text-sm uppercase tracking-widest hover:bg-white hover:text-brand-dark transition-colors duration-300 backdrop-blur-sm"
                 >
                     Shop Collection
                 </motion.button>

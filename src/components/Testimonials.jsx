@@ -39,15 +39,15 @@ const Testimonials = () => {
     }, []);
 
     return (
-        <section className="py-24 bg-white relative overflow-hidden">
+        <section className="py-24 bg-white dark:bg-brand-dark/20 relative overflow-hidden transition-colors duration-500">
             {/* Decorative Background */}
-            <div className="absolute top-0 left-0 w-64 h-64 bg-gray-50 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 opacity-50"></div>
-            <div className="absolute bottom-0 right-0 w-96 h-96 bg-gray-50 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 opacity-50"></div>
+            <div className="absolute top-0 left-0 w-64 h-64 bg-gray-50 dark:bg-brand-gold/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 opacity-50"></div>
+            <div className="absolute bottom-0 right-0 w-96 h-96 bg-gray-50 dark:bg-brand-gold/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 opacity-50"></div>
 
             <div className="container mx-auto px-6 relative z-10">
                 <div className="text-center mb-16">
-                    <h2 className="font-serif text-4xl italic mb-4">Loved by Customers</h2>
-                    <div className="w-16 h-[1px] bg-black mx-auto"></div>
+                    <h2 className="font-serif text-4xl italic mb-4 dark:text-brand-gold">Loved by Customers</h2>
+                    <div className="w-16 h-[1px] bg-brand-dark dark:bg-brand-gold mx-auto"></div>
                 </div>
 
                 <div className="max-w-4xl mx-auto relative">
@@ -55,14 +55,14 @@ const Testimonials = () => {
                         onClick={prev}
                         className="absolute left-0 top-1/2 -translate-y-1/2 p-2 hover:bg-gray-50 rounded-full transition-colors block"
                     >
-                        <ChevronLeft className="w-6 h-6" />
+                        <ChevronLeft className="w-6 h-6 dark:text-brand-light" />
                     </button>
 
                     <button
                         onClick={next}
                         className="absolute right-0 top-1/2 -translate-y-1/2 p-2 hover:bg-gray-50 rounded-full transition-colors block"
                     >
-                        <ChevronRight className="w-6 h-6" />
+                        <ChevronRight className="w-6 h-6 dark:text-brand-light" />
                     </button>
 
                     <div className="overflow-hidden min-h-[250px] flex items-center justify-center">
@@ -75,22 +75,22 @@ const Testimonials = () => {
                                 transition={{ duration: 0.5 }}
                                 className="text-center px-8 md:px-16"
                             >
-                                <Quote className="w-12 h-12 text-gray-200 mx-auto mb-6" />
-                                <p className="font-serif text-2xl md:text-3xl text-gray-800 leading-relaxed mb-8">
+                                <Quote className="w-12 h-12 text-gray-200 dark:text-gray-700 mx-auto mb-6" />
+                                <p className="font-serif text-2xl md:text-3xl text-gray-800 dark:text-brand-light leading-relaxed mb-8">
                                     "{testimonials[currentIndex].text}"
                                 </p>
                                 <div className="flex justify-center gap-1 mb-4">
                                     {[...Array(5)].map((_, i) => (
                                         <Star
                                             key={i}
-                                            className={`w-4 h-4 ${i < testimonials[currentIndex].rating ? 'fill-black text-black' : 'text-gray-300'}`}
+                                            className={`w-4 h-4 ${i < testimonials[currentIndex].rating ? 'fill-brand-dark text-brand-dark dark:fill-brand-gold dark:text-brand-gold' : 'text-gray-300 dark:text-gray-600'}`}
                                         />
                                     ))}
                                 </div>
-                                <h4 className="font-sans font-bold uppercase tracking-widest text-sm">
+                                <h4 className="font-sans font-bold uppercase tracking-widest text-sm dark:text-brand-gold">
                                     {testimonials[currentIndex].name}
                                 </h4>
-                                <span className="text-xs text-gray-500 uppercase tracking-wider mt-1 block">
+                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mt-1 block">
                                     {testimonials[currentIndex].location}
                                 </span>
                             </motion.div>
@@ -102,7 +102,7 @@ const Testimonials = () => {
                             <button
                                 key={index}
                                 onClick={() => setCurrentIndex(index)}
-                                className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentIndex ? 'bg-black w-6' : 'bg-gray-300'}`}
+                                className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentIndex ? 'bg-brand-dark w-6 dark:bg-brand-gold' : 'bg-gray-300 dark:bg-gray-700'}`}
                             />
                         ))}
                     </div>

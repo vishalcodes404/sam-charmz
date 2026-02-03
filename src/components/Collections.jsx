@@ -21,18 +21,18 @@ const Collections = ({ onCategoryClick }) => {
         <section id="collections" className="py-20">
             <div className="container mx-auto px-6">
                 <div className="text-center mb-16">
-                    <h2 className="font-serif text-4xl mb-4 italic">Shop by Category</h2>
-                    <div className="w-16 h-[1px] bg-brand-dark mx-auto"></div>
+                    <h2 className="font-serif text-4xl mb-4 italic dark:text-brand-gold">Shop by Category</h2>
+                    <div className="w-16 h-[1px] bg-brand-dark dark:bg-brand-gold mx-auto"></div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
                     {categories.map((category, index) => (
                         <motion.div
                             key={category.id}
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 50 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: index * 0.1 }}
+                            viewport={{ once: true, margin: "-100px" }}
+                            transition={{ duration: 0.8, delay: index * 0.2 }}
                             className="group relative cursor-pointer overflow-hidden aspect-[4/5]"
                             onClick={() => onCategoryClick && onCategoryClick(category.name)}
                         >
