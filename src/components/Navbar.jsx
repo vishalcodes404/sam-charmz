@@ -28,7 +28,7 @@ const Navbar = ({ cartCount, wishlistCount, user, onSearch, onWishlistClick, onC
                 <div className="container mx-auto px-6 flex justify-between items-center relative">
                     {/* Mobile Menu Button */}
                     <button
-                        className="lg:hidden text-brand-light"
+                        className="lg:hidden text-brand-dark"
                         onClick={() => setIsMobileMenuOpen(true)}
                     >
                         <Menu className="w-6 h-6" />
@@ -37,7 +37,7 @@ const Navbar = ({ cartCount, wishlistCount, user, onSearch, onWishlistClick, onC
                     {/* Logo */}
                     <div className={`flex items-center gap-2 transition-opacity duration-300 ${isSearchOpen ? 'opacity-0 lg:opacity-100' : 'opacity-100'}`}>
                         <img src="/logo.jpg" alt="Sam Charmz" className="h-12 w-auto object-contain cursor-pointer" onClick={onLogoClick} />
-                        <button onClick={onLogoClick} className="text-xl md:text-2xl font-serif italic font-bold tracking-tighter block text-brand-light">
+                        <button onClick={onLogoClick} className="text-xl md:text-2xl font-serif italic font-bold tracking-tighter block text-brand-dark">
                             Sam Charmz
                         </button>
                     </div>
@@ -115,7 +115,7 @@ const Navbar = ({ cartCount, wishlistCount, user, onSearch, onWishlistClick, onC
                     </div>
 
                     {/* Icons */}
-                    <div className="flex items-center gap-6 z-10 text-brand-light">
+                    <div className="flex items-center gap-6 z-10 text-brand-dark">
                         <button
                             onClick={() => setIsSearchOpen(!isSearchOpen)}
                             className="hover:opacity-70 transition-opacity"

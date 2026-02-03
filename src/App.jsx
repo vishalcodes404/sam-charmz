@@ -130,7 +130,7 @@ function App() {
     }, 0);
 
     return (
-        <div className="bg-gradient-animate min-h-screen text-brand-light">
+        <div className="bg-gradient-animate min-h-screen">
             <Navbar
                 cartCount={cartItems.reduce((acc, item) => acc + (item.quantity || 1), 0)}
                 wishlistCount={wishlist.length}
