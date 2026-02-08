@@ -47,17 +47,13 @@ const shopReducer = (state, action) => {
 
         // Wishlist Actions
         case 'TOGGLE_WISHLIST': {
-            const id = action.payload; // Assuming payload is just ID for logic, or full product?
-            // Better to store full product or just ID? 
-            // User requirement: wishlistItems: [{id, name, ...}]
-            const exists = state.wishlist.some(item => item.id === id);
+            const product = action.payload;
+            const exists = state.wishlist.some(item => item.id === product.id);
             let newWishlist;
             if (exists) {
-                newWishlist = state.wishlist.filter(item => item.id !== id);
+                newWishlist = state.wishlist.filter(item => item.id !== product.id);
             } else {
-                // If we only pass ID, we can't add full object. 
-                // We must ensure action.payload is the FULL PRODUCT OBJECT when adding.
-                newWishlist = [...state.wishlist, action.payload];
+                newWishlist = [...state.wishlist, product];
             }
             return { ...state, wishlist: newWishlist };
         }

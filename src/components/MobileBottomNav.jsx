@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Home, ShoppingBag, Search, Grid } from 'lucide-react';
+import { Home, ShoppingBag, Search, Grid, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useShop } from '../context/ShopContext';
 
 const MobileBottomNav = ({ currentView, onNavigate, onSearchClick }) => {
-    const { cart, openCart } = useShop();
+    const { cart, openCart, wishlist, openWishlist } = useShop();
     const cartCount = cart.reduce((acc, item) => acc + (item.quantity || 1), 0);
 
     const [isVisible, setIsVisible] = useState(true);
@@ -29,6 +29,13 @@ const MobileBottomNav = ({ currentView, onNavigate, onSearchClick }) => {
         { id: 'home', icon: Home, label: 'Home', action: () => onNavigate('home') },
         { id: 'shop', icon: Grid, label: 'Shop', action: () => onNavigate('shop') },
         { id: 'search', icon: Search, label: 'Search', action: onSearchClick },
+        {
+            id: 'wishlist',
+            icon: Heart,
+            label: 'Wishlist',
+            action: openWishlist,
+            badge: wishlist.length
+        },
         {
             id: 'cart',
             icon: ShoppingBag,
