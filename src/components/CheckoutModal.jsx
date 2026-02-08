@@ -1,8 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Lock, CheckCircle, CreditCard, Loader2 } from 'lucide-react';
+import { useShop } from '../context/ShopContext';
 
-const CheckoutModal = ({ isOpen, onClose, cartItems, total }) => {
+const CheckoutModal = ({ isOpen, onClose }) => {
+    const { cart } = useShop();
+    const total = cart.reduce((acc, item) => {
+        const price = parseFloat(item.price.replace(/[₹,]/g, ''));
+        return acc + price * (item.quantity || 1);
+    }, 0);
+
     const [step, setStep] = useState('details'); // details, processing, success
     const [loading, setLoading] = useState(false);
 
@@ -14,6 +21,7 @@ const CheckoutModal = ({ isOpen, onClose, cartItems, total }) => {
         setTimeout(() => {
             setLoading(false);
             setStep('success');
+            // Optionally clear cart here using clearCart() from context
         }, 2000);
     };
 

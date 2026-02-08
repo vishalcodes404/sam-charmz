@@ -1,21 +1,24 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShoppingBag, Trash2 } from 'lucide-react';
+import { useShop } from '../context/ShopContext';
 
-const WishlistDrawer = ({ isOpen, onClose, wishlistItems, products, removeFromWishlist, addToCart }) => {
-    // Filter products to show only those in the wishlist
-    const items = products.filter(product => wishlistItems.includes(product.id));
+const WishlistDrawer = () => {
+    const {
+        isWishlistOpen, closeWishlist,
+        wishlist, toggleWishlist, moveToCart
+    } = useShop();
 
     return (
         <AnimatePresence>
-            {isOpen && (
+            {isWishlistOpen && (
                 <>
                     {/* Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        onClick={onClose}
+                        onClick={closeWishlist}
                         className="fixed inset-0 bg-black/20 z-[60] backdrop-blur-sm"
                     />
 
@@ -25,14 +28,14 @@ const WishlistDrawer = ({ isOpen, onClose, wishlistItems, products, removeFromWi
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                        className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-white z-[70] shadow-2xl flex flex-col"
+                        className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-brand-surface z-[70] shadow-2xl flex flex-col border-l border-white/10"
                     >
                         {/* Header */}
-                        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white">
-                            <h2 className="font-serif text-2xl italic">Your Wishlist ({items.length})</h2>
+                        <div className="p-6 border-b border-white/10 flex justify-between items-center bg-brand-surface">
+                            <h2 className="font-serif text-2xl italic text-brand-light">Your Wishlist ({wishlist.length})</h2>
                             <button
-                                onClick={onClose}
-                                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                                onClick={closeWishlist}
+                                className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-brand-light"
                             >
                                 <X className="w-6 h-6" />
                             </button>
@@ -40,22 +43,22 @@ const WishlistDrawer = ({ isOpen, onClose, wishlistItems, products, removeFromWi
 
                         {/* Content */}
                         <div className="flex-1 overflow-y-auto p-6">
-                            {items.length === 0 ? (
-                                <div className="h-full flex flex-col items-center justify-center text-center text-gray-500 gap-4">
+                            {wishlist.length === 0 ? (
+                                <div className="h-full flex flex-col items-center justify-center text-center text-gray-400 gap-4">
                                     <ShoppingBag className="w-16 h-16 opacity-20" />
                                     <p className="font-sans text-lg">Your wishlist is empty.</p>
                                     <button
-                                        onClick={onClose}
-                                        className="text-black border-b border-black text-sm uppercase tracking-wide mt-2"
+                                        onClick={closeWishlist}
+                                        className="text-brand-primary border-b border-brand-primary text-sm uppercase tracking-wide mt-2 hover:text-brand-light hover:border-brand-light transition-colors"
                                     >
                                         Start Shopping
                                     </button>
                                 </div>
                             ) : (
                                 <div className="flex flex-col gap-6">
-                                    {items.map(item => (
-                                        <div key={item.id} className="flex gap-4 p-2 hover:bg-gray-50 rounded-lg transition-colors group">
-                                            <div className="w-24 h-24 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
+                                    {wishlist.map(item => (
+                                        <div key={item.id} className="flex gap-4 p-3 hover:bg-white/5 rounded-xl transition-colors group border border-transparent hover:border-white/5">
+                                            <div className="w-24 h-24 flex-shrink-0 bg-white/5 rounded-lg overflow-hidden">
                                                 <img
                                                     src={item.image}
                                                     alt={item.name}
@@ -64,20 +67,20 @@ const WishlistDrawer = ({ isOpen, onClose, wishlistItems, products, removeFromWi
                                             </div>
                                             <div className="flex-1 flex flex-col justify-between">
                                                 <div>
-                                                    <h3 className="font-serif text-lg leading-tight mb-1">{item.name}</h3>
-                                                    <p className="font-sans text-sm text-gray-500">{item.price}</p>
+                                                    <h3 className="font-serif text-lg leading-tight mb-1 text-brand-light">{item.name}</h3>
+                                                    <p className="font-sans text-sm text-brand-primary">{item.price}</p>
                                                 </div>
 
                                                 <div className="flex gap-3 mt-4">
                                                     <button
-                                                        onClick={() => { addToCart(item.id); removeFromWishlist(item.id); }}
-                                                        className="flex-1 bg-black text-white text-xs uppercase tracking-widest py-2 px-4 hover:bg-gray-800 transition-colors"
+                                                        onClick={() => moveToCart(item)}
+                                                        className="flex-1 bg-brand-primary text-brand-dark text-xs uppercase font-bold tracking-widest py-2 px-4 hover:bg-white transition-colors rounded-lg"
                                                     >
                                                         Add to Cart
                                                     </button>
                                                     <button
-                                                        onClick={() => removeFromWishlist(item.id)}
-                                                        className="p-2 text-gray-400 hover:text-red-500 border border-gray-200 hover:border-red-200 transition-colors"
+                                                        onClick={() => toggleWishlist(item)}
+                                                        className="p-2 text-gray-400 hover:text-red-400 border border-white/10 hover:border-red-400/30 transition-colors rounded-lg hover:bg-red-400/10"
                                                     >
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>

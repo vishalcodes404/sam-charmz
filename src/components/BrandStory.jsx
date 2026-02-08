@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 
 const BrandStory = () => {
     return (
-        <section className="py-20 bg-brand-dark text-white">
+        <section className="py-16 bg-transparent text-brand-light relative">
+            <div className="absolute inset-0 bg-brand-surface/30 skew-y-3 transform origin-bottom-left -z-10"></div>
             <div className="container mx-auto px-6">
                 <div className="flex flex-col md:flex-row items-center gap-16">
                     <motion.div
@@ -27,16 +28,16 @@ const BrandStory = () => {
                         viewport={{ once: true }}
                         className="w-full md:w-1/2 md:pl-10"
                     >
-                        <h2 className="font-serif text-4xl md:text-5xl mb-8 italic text-brand-gold">
+                        <h2 className="font-serif text-3xl md:text-5xl mb-6 italic text-brand-primary">
                             The Art of Details
                         </h2>
-                        <p className="font-sans text-gray-300 leading-relaxed mb-8 font-light">
+                        <p className="font-sans text-gray-400 leading-relaxed mb-6 font-light">
                             At Sam Charmz, we believe that jewelry is more than just an accessory—it is an expression of individuality. Our pieces are meticulously handcrafted, blending timeless traditions with contemporary design.
                         </p>
-                        <p className="font-sans text-gray-300 leading-relaxed mb-8 font-light">
+                        <p className="font-sans text-gray-400 leading-relaxed mb-8 font-light">
                             Each collection tells a unique story, inspired by the beauty of the natural world and the strength of the human spirit.
                         </p>
-                        <a href="#" className="inline-block border-b border-brand-gold text-brand-gold pb-1 tracking-widest uppercase text-sm hover:opacity-80 transition-opacity">
+                        <a href="#" className="inline-block border-b border-brand-primary text-brand-primary pb-1 tracking-widest uppercase text-xs hover:text-white hover:border-white transition-colors">
                             Read Our Story
                         </a>
                     </motion.div>

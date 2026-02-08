@@ -19,10 +19,10 @@ const categories = [
 const Collections = ({ onCategoryClick }) => {
     return (
         <section id="collections" className="py-20">
-            <div className="container mx-auto px-6">
-                <div className="text-center mb-16">
-                    <h2 className="font-serif text-4xl mb-4 italic dark:text-brand-gold">Shop by Category</h2>
-                    <div className="w-16 h-[1px] bg-brand-dark dark:bg-brand-gold mx-auto"></div>
+            <div className="container mx-auto px-4 md:px-8">
+                <div className="text-center mb-12">
+                    <h2 className="font-serif text-3xl md:text-4xl mb-4 italic text-brand-primary">Shop by Category</h2>
+                    <div className="w-16 h-[1px] bg-brand-primary/50 mx-auto"></div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">

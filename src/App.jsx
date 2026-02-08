@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { useShop } from './context/ShopContext';
+
+// Components
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Collections from './components/Collections';
@@ -14,47 +17,25 @@ import Testimonials from './components/Testimonials';
 import CheckoutModal from './components/CheckoutModal';
 import PolicyModal from './components/PolicyModal';
 import AuthModal from './components/AuthModal';
+
+import MobileBottomNav from './components/MobileBottomNav';
+import MobileSearchBar from './components/ui/MobileSearchBar';
+
 import { products } from './data/products';
 
 function App() {
-    const [cartItems, setCartItems] = useState([]);
-    const [wishlist, setWishlist] = useState([]);
-    const [user, setUser] = useState(null); // { firstName, lastName, ... }
-
-    // Modal States
-    const [isWishlistOpen, setIsWishlistOpen] = useState(false);
-    const [isCartOpen, setIsCartOpen] = useState(false);
-    const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-    const [isPolicyOpen, setIsPolicyOpen] = useState(false);
-    const [isAuthOpen, setIsAuthOpen] = useState(false);
-
-    const [policyTab, setPolicyTab] = useState('about');
-    const [searchTerm, setSearchTerm] = useState("");
-
-    // View State: 'home', 'shop', 'product'
+    // Context hook is used in Main, or Components, but we need to declare App inside provider.
+    // App handles Routing/View State
     const [currentView, setCurrentView] = useState('home');
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState("All");
 
-    const handleLogin = (userData) => {
-        // If logging in via normal login (no name provided), Mock a name
-        const finalUser = {
-            ...userData,
-            firstName: userData.firstName || "Sam", // Default mock name for demo
-            lastName: userData.lastName || "Charmz"
-        };
-        setUser(finalUser);
-    };
-
-    const handleLogout = () => {
-        setUser(null);
-    };
-
-    const handleProductClick = (product) => {
-        setSelectedProduct(product);
-        setCurrentView('product');
-        window.scrollTo(0, 0);
-    };
+    // Search State
+    const [showMobileSearch, setShowMobileSearch] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [policyTab, setPolicyTab] = useState('about');
+    const [isPolicyOpen, setIsPolicyOpen] = useState(false);
+    const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
     const handleNavigation = (view) => {
         setCurrentView(view);
@@ -68,111 +49,110 @@ function App() {
         window.scrollTo(0, 0);
     };
 
+    const handleSearchChange = (term) => {
+        setSearchTerm(term);
+        if (currentView === 'product' && term.length > 0) {
+            setCurrentView('home');
+        }
+    };
+
+    const toggleMobileSearch = () => {
+        setShowMobileSearch(prev => !prev);
+    };
+
     const handlePolicyClick = (tab = 'about') => {
         setPolicyTab(tab);
         setIsPolicyOpen(true);
     };
 
-    const addToCart = (product) => {
-        setCartItems(prev => {
-            const existingItem = prev.find(item => item.id === product.id);
-            if (existingItem) {
-                return prev.map(item =>
-                    item.id === product.id
-                        ? { ...item, quantity: (item.quantity || 1) + (product.quantity || 1) }
-                        : item
-                );
-            }
-            return [...prev, { ...product, quantity: product.quantity || 1 }];
-        });
-        setIsCartOpen(true);
-    };
-
-    const removeFromCart = (id) => {
-        setCartItems(prev => prev.filter(item => item.id !== id));
-    };
-
-    const updateCartQuantity = (id, change) => {
-        setCartItems(prev => prev.map(item => {
-            if (item.id === id) {
-                const newQuantity = Math.max(1, (item.quantity || 1) + change);
-                return { ...item, quantity: newQuantity };
-            }
-            return item;
-        }));
-    };
-
-    const toggleWishlist = (id) => {
-        setWishlist(prev =>
-            prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    const filteredProducts = products.filter(product => {
+        const lowerTerm = searchTerm.toLowerCase();
+        return (
+            product.name.toLowerCase().includes(lowerTerm) ||
+            product.category.toLowerCase().includes(lowerTerm) ||
+            (product.tags && product.tags.some(tag => tag.toLowerCase().includes(lowerTerm)))
         );
-    };
-
-    const handleSearch = (term) => {
-        setSearchTerm(term);
-        if (term) {
-            handleNavigation('home'); // Go to home grid for search results
-            setTimeout(() => {
-                const element = document.getElementById('products');
-                if (element) element.scrollIntoView({ behavior: 'smooth' });
-            }, 100);
-        }
-    };
-
-    // Filter products based on search term (for Home Grid)
-    const filteredProducts = products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    const cartTotal = cartItems.reduce((total, item) => {
-        const price = parseFloat(item.price.replace(/[₹,]/g, ''));
-        return total + price * (item.quantity || 1);
-    }, 0);
+    });
 
     return (
-        <div className="bg-gradient-animate min-h-screen">
-            <Navbar
-                cartCount={cartItems.reduce((acc, item) => acc + (item.quantity || 1), 0)}
-                wishlistCount={wishlist.length}
-                user={user}
-                onSearch={handleSearch}
-                onWishlistClick={() => setIsWishlistOpen(true)}
-                onCartClick={() => setIsCartOpen(true)}
-                onLogoClick={() => handleNavigation('home')}
-                onShopClick={() => handleNavigation('shop')}
-                onUserClick={() => setIsAuthOpen(true)}
-            />
+        <div className="relative min-h-screen text-brand-light bg-brand-dark overflow-x-hidden">
 
-            <WishlistDrawer
-                isOpen={isWishlistOpen}
-                onClose={() => setIsWishlistOpen(false)}
-                wishlistItems={wishlist}
-                products={products}
-                removeFromWishlist={toggleWishlist}
-                addToCart={(id) => {
-                    const product = products.find(p => p.id === id);
-                    if (product) addToCart(product);
-                }}
-            />
+            {/* Drawers & Modals attached to Context State */}
+            <CartDrawer />
+            <WishlistDrawer />
+            <AuthModal />
 
-            <CartDrawer
-                isOpen={isCartOpen}
-                onClose={() => setIsCartOpen(false)}
-                cartItems={cartItems}
-                removeFromCart={removeFromCart}
-                updateQuantity={updateCartQuantity}
-                onCheckout={() => {
-                    setIsCartOpen(false);
-                    setIsCheckoutOpen(true);
-                }}
-            />
+            <div className="relative z-10 flex flex-col min-h-screen">
+                <Navbar
+                    onSearch={handleSearchChange}
+                    searchTerm={searchTerm}
+                    onLogoClick={() => handleNavigation('home')}
+                    onShopClick={() => handleNavigation('shop')}
+                />
 
-            <CheckoutModal
-                isOpen={isCheckoutOpen}
-                onClose={() => setIsCheckoutOpen(false)}
-                cartItems={cartItems}
-                total={cartTotal}
-            />
+                <MobileSearchBar
+                    isOpen={showMobileSearch}
+                    onClose={() => {
+                        setShowMobileSearch(false);
+                        setSearchTerm('');
+                    }}
+                    searchTerm={searchTerm}
+                    onSearchChange={handleSearchChange}
+                />
+
+                <MobileBottomNav
+                    currentView={currentView}
+                    onNavigate={handleNavigation}
+                    onSearchClick={toggleMobileSearch}
+                />
+
+                <div className="min-h-screen">
+                    {currentView === 'product' && selectedProduct && (
+                        <div key="product" className="animate-fade-in">
+                            <ProductDetail
+                                product={selectedProduct}
+                                onBack={() => handleNavigation('shop')}
+                            />
+                            <TrustSection />
+                            <Testimonials />
+                        </div>
+                    )}
+
+                    {currentView === 'shop' && (
+                        <div key="shop" className="animate-fade-in">
+                            <Shop
+                                onProductClick={(p) => { setSelectedProduct(p); setCurrentView('product'); }}
+                                initialCategory={selectedCategory}
+                            />
+                        </div>
+                    )}
+
+                    {currentView === 'home' && (
+                        <div key="home" className="animate-fade-in">
+                            {!searchTerm && <Hero onShopClick={() => handleNavigation('shop')} />}
+
+                            {!searchTerm && <TrustSection />}
+                            {!searchTerm && <Collections onCategoryClick={handleCategoryClick} />}
+
+                            <div id="products" className={searchTerm ? "pt-24" : ""}>
+                                <ProductGrid
+                                    products={filteredProducts}
+                                    isSearching={searchTerm.length > 0}
+                                    onProductClick={(p) => { setSelectedProduct(p); setCurrentView('product'); }}
+                                    onViewAll={() => handleNavigation('shop')}
+                                />
+                            </div>
+
+                            {!searchTerm && <Testimonials />}
+                            {!searchTerm && <div id="brand-story"><BrandStory /></div>}
+                        </div>
+                    )}
+                </div>
+
+                <div id="footer">
+                    <Footer onPolicyClick={handlePolicyClick} />
+                </div>
+            </div>
 
             <PolicyModal
                 isOpen={isPolicyOpen}
@@ -180,62 +160,11 @@ function App() {
                 defaultTab={policyTab}
             />
 
-            <AuthModal
-                isOpen={isAuthOpen}
-                onClose={() => setIsAuthOpen(false)}
-                onLogin={handleLogin}
+            <CheckoutModal
+                isOpen={isCheckoutOpen}
+                onClose={() => setIsCheckoutOpen(false)}
             />
 
-            {currentView === 'product' && selectedProduct && (
-                <>
-                    <ProductDetail
-                        product={selectedProduct}
-                        onBack={() => handleNavigation('shop')}
-                        addToCart={addToCart}
-                        toggleWishlist={toggleWishlist}
-                        isWishlisted={wishlist.includes(selectedProduct.id)}
-                    />
-                    <TrustSection />
-                    <Testimonials />
-                </>
-            )}
-
-            {currentView === 'shop' && (
-                <Shop
-                    addToCart={addToCart}
-                    wishlist={wishlist}
-                    toggleWishlist={toggleWishlist}
-                    onProductClick={handleProductClick}
-                    initialCategory={selectedCategory}
-                />
-            )}
-
-            {currentView === 'home' && (
-                <>
-                    <Hero onShopClick={() => handleNavigation('shop')} />
-                    <TrustSection />
-                    <Collections onCategoryClick={handleCategoryClick} />
-                    <div id="products">
-                        <ProductGrid
-                            addToCart={addToCart}
-                            products={filteredProducts}
-                            wishlist={wishlist}
-                            toggleWishlist={toggleWishlist}
-                            isSearching={searchTerm.length > 0}
-                            onProductClick={handleProductClick}
-                            onViewAll={() => handleNavigation('shop')}
-                        />
-                    </div>
-                    <Testimonials />
-                    <div id="brand-story">
-                        <BrandStory />
-                    </div>
-                </>
-            )}
-
-            <div id="footer">
-                <Footer onPolicyClick={handlePolicyClick} />
-            </div>
         </div>
     );
 }

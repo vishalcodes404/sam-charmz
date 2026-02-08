@@ -1,185 +1,170 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Search, ShoppingBag, User, Menu, X, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useShop } from '../context/ShopContext';
 
-const Navbar = ({ cartCount, wishlistCount, user, onSearch, onWishlistClick, onCartClick, onLogoClick, onShopClick, onUserClick }) => {
+const Navbar = ({ onSearch, searchTerm, onLogoClick, onShopClick }) => {
+    const {
+        cart, wishlist, user,
+        openCart, openWishlist, openAuth
+    } = useShop();
+
+    const cartCount = cart.reduce((acc, item) => acc + (item.quantity || 1), 0);
+    const wishlistCount = wishlist.length;
+
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+    const searchInputRef = useRef(null);
 
     useEffect(() => {
         const handleScroll = () => {
-            setIsScrolled(window.scrollY > 20);
+            setIsScrolled(window.scrollY > 10);
         };
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    useEffect(() => {
+        if (isSearchExpanded && searchInputRef.current) {
+            searchInputRef.current.focus();
+        }
+    }, [isSearchExpanded]);
+
+    const handleSearchChange = (e) => {
+        const query = e.target.value;
+        onSearch(query);
+    };
+
+    const toggleSearch = () => {
+        setIsSearchExpanded(!isSearchExpanded);
+    };
+
     return (
         <>
-            <motion.nav
-                initial={{ y: -100 }}
-                animate={{ y: 0 }}
-                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-                    ? 'bg-white/80 dark:bg-brand-dark/90 backdrop-blur-md shadow-sm border-b border-gray-200 dark:border-white/10 py-4'
-                    : 'bg-transparent py-6'
+            <nav
+                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b ${isScrolled
+                    ? 'bg-brand-dark/90 backdrop-blur-md border-white/5 py-3 shadow-[0_4px_30px_rgba(0,0,0,0.1)]'
+                    : 'bg-transparent border-transparent py-5'
                     }`}
             >
-                <div className="container mx-auto px-6 flex justify-between items-center relative">
+                <div className="container mx-auto px-4 md:px-8 flex justify-between items-center relative">
                     {/* Mobile Menu Button */}
                     <button
-                        className="lg:hidden text-brand-dark"
+                        className="lg:hidden p-2 -ml-2 text-brand-light hover:bg-white/10 rounded-full transition-colors"
                         onClick={() => setIsMobileMenuOpen(true)}
                     >
                         <Menu className="w-6 h-6" />
                     </button>
 
                     {/* Logo */}
-                    <div className={`flex items-center gap-2 transition-opacity duration-300 ${isSearchOpen ? 'opacity-0 lg:opacity-100' : 'opacity-100'}`}>
-                        <img src="/logo.jpg" alt="Sam Charmz" className="h-12 w-auto object-contain cursor-pointer" onClick={onLogoClick} />
-                        <button onClick={onLogoClick} className="text-xl md:text-2xl font-serif italic font-bold tracking-tighter block text-brand-dark">
-                            Sam Charmz
-                        </button>
+                    <div
+                        onClick={onLogoClick}
+                        className="flex items-center gap-2 cursor-pointer absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 lg:mr-8"
+                    >
+                        <span className="font-serif text-2xl md:text-3xl italic font-bold tracking-tighter text-brand-light">
+                            Sam <span className="text-brand-primary">Charmz</span>
+                        </span>
                     </div>
 
                     {/* Desktop Navigation */}
-                    <div className={`hidden lg:flex items-center gap-12 font-sans font-medium text-sm tracking-wide transition-opacity duration-300 ${isSearchOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-                        <button
-                            onClick={(e) => { e.preventDefault(); onLogoClick(); }}
-                            className="relative group py-1 bg-transparent border-none cursor-pointer"
-                        >
-                            HOME
-                            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-300 group-hover:w-full"></span>
-                        </button>
-
-                        <button
-                            onClick={(e) => { e.preventDefault(); onLogoClick(); setTimeout(() => { const el = document.getElementById('products'); if (el) el.scrollIntoView({ behavior: 'smooth' }) }, 100); }}
-                            className="relative group py-1 bg-transparent border-none cursor-pointer"
-                        >
-                            NEW ARRIVALS
-                            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-brand-dark transition-all duration-300 group-hover:w-full"></span>
-                        </button>
-
-                        <button
-                            onClick={onShopClick}
-                            className="relative group py-1 bg-transparent border-none cursor-pointer"
-                        >
-                            SHOP
-                            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-brand-dark transition-all duration-300 group-hover:w-full"></span>
-                        </button>
-
-                        <a
-                            href="#brand-story"
-                            onClick={(e) => {
-                                if (!document.getElementById('brand-story')) {
-                                    e.preventDefault();
-                                    onLogoClick();
-                                    setTimeout(() => {
-                                        const el = document.getElementById('brand-story');
-                                        if (el) el.scrollIntoView({ behavior: 'smooth' });
-                                    }, 100);
-                                }
-                            }}
-                            className="relative group py-1"
-                        >
-                            STORY
-                            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-brand-dark transition-all duration-300 group-hover:w-full"></span>
-                        </a>
-
-                        <a
-                            href="#footer"
-                            className="relative group py-1"
-                        >
-                            CONTACT
-                            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-brand-dark transition-all duration-300 group-hover:w-full"></span>
-                        </a>
+                    <div className="hidden lg:flex items-center gap-8 mx-auto">
+                        <NavLink onClick={onLogoClick} text="Home" />
+                        <NavLink onClick={onShopClick} text="Collections" />
+                        <NavLink onClick={() => { onLogoClick(); setTimeout(() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' }), 100) }} text="New In" />
+                        <NavLink href="#brand-story" text="Our Story" />
                     </div>
 
-                    {/* Search Bar Overlay */}
-                    <div className={`absolute left-0 right-0 mx-auto w-full max-w-xl flex items-center justify-center transition-all duration-300 ${isSearchOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-4'}`}>
-                        <div className="relative w-full px-4 md:px-0">
-                            <input
-                                type="text"
-                                placeholder="Search for jewelry..."
-                                className="w-full border-b border-brand-dark py-2 pl-2 pr-10 bg-transparent outline-none font-sans text-sm placeholder-gray-500"
-                                onChange={(e) => onSearch(e.target.value)}
-                                autoFocus={isSearchOpen}
-                            />
-                            <button
-                                onClick={() => { setIsSearchOpen(false); onSearch(''); }}
-                                className="absolute right-4 md:right-0 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black"
-                            >
-                                <X className="w-4 h-4" />
+                    {/* Right Icons & Actions */}
+                    <div className="flex items-center gap-3">
+                        {/* Inline Search (Desktop) */}
+                        <div className="hidden lg:flex items-center relative group">
+                            <AnimatePresence>
+                                {isSearchExpanded && (
+                                    <motion.input
+                                        ref={searchInputRef}
+                                        initial={{ width: 0, opacity: 0 }}
+                                        animate={{ width: 200, opacity: 1 }}
+                                        exit={{ width: 0, opacity: 0 }}
+                                        type="text"
+                                        placeholder="Search..."
+                                        value={searchTerm}
+                                        onChange={handleSearchChange}
+                                        className="bg-white/10 border border-white/20 rounded-full py-1.5 px-4 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:border-brand-primary mr-2"
+                                    />
+                                )}
+                            </AnimatePresence>
+                            <button onClick={toggleSearch} className="p-2 hover:bg-white/10 rounded-full transition-colors text-brand-light hover:text-brand-primary">
+                                {isSearchExpanded ? <X className="w-5 h-5" /> : <Search className="w-5 h-5" />}
                             </button>
                         </div>
-                    </div>
 
-                    {/* Icons */}
-                    <div className="flex items-center gap-6 z-10 text-brand-dark">
-                        <button
-                            onClick={() => setIsSearchOpen(!isSearchOpen)}
-                            className="hover:opacity-70 transition-opacity"
-                        >
-                            <Search className="w-5 h-5 stroke-[1.5]" />
-                        </button>
+                        <div className="hidden lg:flex items-center gap-2 border-l border-white/10 pl-3">
+                            <button onClick={openWishlist} className="relative p-2 hover:bg-white/10 rounded-full transition-colors text-brand-light hover:text-brand-primary">
+                                <Heart className="w-5 h-5" />
+                                {wishlistCount > 0 && (
+                                    <span className="absolute top-0 right-0 bg-brand-secondary text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
+                                        {wishlistCount}
+                                    </span>
+                                )}
+                            </button>
+                            <button onClick={openAuth} className="p-2 hover:bg-white/10 rounded-full transition-colors text-brand-light hover:text-brand-primary flex items-center gap-2">
+                                <User className="w-5 h-5" />
+                                {user && <span className="text-xs font-medium hidden xl:block">{user.firstName}</span>}
+                            </button>
+                        </div>
 
-                        <button
-                            onClick={onUserClick}
-                            className="flex items-center gap-2 hover:opacity-70 transition-opacity"
-                        >
-                            <User className="w-5 h-5 stroke-[1.5]" />
-                            {user && (
-                                <span className="text-sm font-medium hidden lg:block">Hi, {user.firstName}</span>
-                            )}
-                        </button>
-
-                        <button
-                            onClick={onWishlistClick}
-                            className="block hover:opacity-70 transition-opacity relative"
-                        >
-                            <Heart className="w-5 h-5 stroke-[1.5]" />
-                            {wishlistCount > 0 && (
-                                <span className="absolute -top-2 -right-2 bg-brand-dark text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
-                                    {wishlistCount}
-                                </span>
-                            )}
-                        </button>
-                        <button
-                            onClick={onCartClick}
-                            className="relative hover:opacity-70 transition-opacity"
-                        >
-                            <ShoppingBag className="w-5 h-5 stroke-[1.5]" />
-                            <span className="absolute -top-2 -right-2 bg-brand-dark text-brand-gold text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
+                        {/* Cart Button */}
+                        <button onClick={openCart} className="relative p-2 hover:bg-white/10 rounded-full transition-colors text-brand-light hover:text-brand-primary group">
+                            <ShoppingBag className="w-5 h-5" />
+                            <span className="absolute top-0 right-0 bg-brand-primary text-brand-dark text-[10px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
                                 {cartCount}
                             </span>
                         </button>
                     </div>
                 </div>
-            </motion.nav>
-            {/* Mobile Menu Overlay */}
+            </nav>
+
+            {/* Mobile Full Screen Menu */}
             <AnimatePresence>
                 {isMobileMenuOpen && (
                     <motion.div
-                        initial={{ opacity: 0, x: -100 }}
+                        initial={{ opacity: 0, x: '-100%' }}
                         animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -100 }}
-                        className="fixed inset-0 z-50 bg-white p-6 lg:hidden"
+                        exit={{ opacity: 0, x: '-100%' }}
+                        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                        className="fixed inset-0 z-[60] bg-brand-dark flex flex-col"
                     >
-                        <div className="flex justify-between items-center mb-8">
-                            <h2 className="font-serif text-2xl italic">Menu</h2>
-                            <button onClick={() => setIsMobileMenuOpen(false)}>
+                        <div className="p-5 flex justify-between items-center border-b border-white/10">
+                            <span className="font-serif text-2xl italic font-bold text-brand-light">Menu</span>
+                            <button
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="p-2 -mr-2 hover:bg-white/10 rounded-full text-brand-light"
+                            >
                                 <X className="w-6 h-6" />
                             </button>
                         </div>
-                        <div className="flex flex-col gap-6 font-sans text-lg">
-                            <button onClick={() => { setIsMobileMenuOpen(false); onLogoClick(); }} className="text-left border-b pb-2">Home</button>
-                            <button onClick={() => { setIsMobileMenuOpen(false); onLogoClick(); }} className="text-left border-b pb-2">New Arrivals</button>
-                            <button onClick={onShopClick} className="text-left border-b pb-2">Shop</button>
-                            <a href="#brand-story" className="border-b pb-2" onClick={() => setIsMobileMenuOpen(false)}>Story</a>
-                            <a href="#footer" className="border-b pb-2" onClick={() => setIsMobileMenuOpen(false)}>Contact</a>
-                            <button onClick={() => { setIsMobileMenuOpen(false); onUserClick(); }} className="text-left border-b pb-2 font-bold">
-                                {user ? `Hi, ${user.firstName}` : 'Sign In / Register'}
-                            </button>
+
+                        <div className="flex-1 flex flex-col justify-center items-center gap-8 p-8">
+                            <MobileNavLink onClick={() => { setIsMobileMenuOpen(false); onLogoClick(); }} text="Home" delay={0.1} />
+                            <MobileNavLink onClick={() => { setIsMobileMenuOpen(false); onShopClick(); }} text="Collections" delay={0.2} />
+                            <MobileNavLink onClick={() => { setIsMobileMenuOpen(false); openWishlist(); }} text="Wishlist" delay={0.25} />
+                            <MobileNavLink onClick={() => { setIsMobileMenuOpen(false); onLogoClick(); setTimeout(() => document.getElementById('products')?.scrollIntoView(), 100); }} text="New Arrivals" delay={0.3} />
+                            <MobileNavLink href="#brand-story" onClick={() => setIsMobileMenuOpen(false)} text="Our Story" delay={0.4} />
+
+                            <motion.button
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.5 }}
+                                onClick={() => { setIsMobileMenuOpen(false); openAuth(); }}
+                                className="mt-8 text-sm font-medium text-brand-primary hover:text-white transition-colors"
+                            >
+                                {user ? `Signed in as ${user.firstName}` : 'Sign In / Register'}
+                            </motion.button>
+                        </div>
+
+                        <div className="p-8 text-center border-t border-white/10">
+                            <p className="text-gray-500 text-xs uppercase tracking-widest">Designed for elegance</p>
                         </div>
                     </motion.div>
                 )}
@@ -187,5 +172,37 @@ const Navbar = ({ cartCount, wishlistCount, user, onSearch, onWishlistClick, onC
         </>
     );
 };
+
+const NavLink = ({ text, onClick, href }) => (
+    href ? (
+        <a href={href} className="text-sm font-medium tracking-wide text-brand-light/80 hover:text-brand-primary transition-colors relative group">
+            {text}
+            <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-primary transition-all group-hover:w-full" />
+        </a>
+    ) : (
+        <button onClick={onClick} className="text-sm font-medium tracking-wide text-brand-light/80 hover:text-brand-primary transition-colors relative group">
+            {text}
+            <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-primary transition-all group-hover:w-full" />
+        </button>
+    )
+);
+
+const MobileNavLink = ({ text, onClick, href, delay }) => (
+    <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay }}
+    >
+        {href ? (
+            <a href={href} onClick={onClick} className="font-serif text-3xl text-brand-light hover:text-brand-primary transition-colors block">
+                {text}
+            </a>
+        ) : (
+            <button onClick={onClick} className="font-serif text-3xl text-brand-light hover:text-brand-primary transition-colors">
+                {text}
+            </button>
+        )}
+    </motion.div>
+);
 
 export default Navbar;
