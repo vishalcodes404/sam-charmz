@@ -56,11 +56,11 @@ const Footer = ({ onPolicyClick }) => {
                     <ul className="space-y-4 text-gray-400 text-sm font-sans mb-8">
                         <li className="flex items-start gap-3">
                             <MapPin className="w-5 h-5 text-brand-primary shrink-0" />
-                            <span>123 Fashion Avenue, Design District, Mumbai, India</span>
+                            <span>Dasamplayam road,Mettupalayam,641301</span>
                         </li>
                         <li className="flex items-center gap-3">
                             <Phone className="w-5 h-5 text-brand-primary shrink-0" />
-                            <a href="https://wa.me/917304603610" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">+91 73046 03610</a>
+                            <a href="https://wa.me/916384110101" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">+91 73046 03610</a>
                         </li>
                         <li className="flex items-center gap-3">
                             <Mail className="w-5 h-5 text-brand-primary shrink-0" />

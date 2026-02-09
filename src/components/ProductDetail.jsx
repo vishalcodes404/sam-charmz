@@ -86,12 +86,22 @@ const ProductDetail = ({ product, onBack }) => {
                                     >
                                         <ShoppingBag className="w-4 h-4" /> Add to Cart
                                     </button>
-                                    <button
-                                        onClick={() => toggleWishlist(product.id)}
+                                    <motion.button
+                                        whileTap={{ scale: 0.9 }}
+                                        onClick={() => toggleWishlist(product)}
+                                        aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
                                         className={`w-12 h-12 flex items-center justify-center border rounded-full ${isWishlisted ? 'border-brand-secondary text-brand-secondary bg-brand-secondary/10' : 'border-white/20 text-white hover:bg-white/10'} transition-colors shrink-0`}
                                     >
-                                        <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
-                                    </button>
+                                        <motion.div
+                                            initial={false}
+                                            animate={{
+                                                scale: isWishlisted ? [1, 1.2, 1] : [1, 0.9, 1]
+                                            }}
+                                            transition={{ duration: 0.3 }}
+                                        >
+                                            <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
+                                        </motion.div>
+                                    </motion.button>
                                 </div>
                             </div>
 

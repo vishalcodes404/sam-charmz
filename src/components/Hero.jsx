@@ -16,16 +16,26 @@ const Hero = ({ onShopClick }) => {
 
     return (
         <section ref={ref} className="relative h-auto min-h-[550px] md:h-[85vh] w-full overflow-hidden flex items-center justify-center pb-12 pt-20">
-            {/* Background Image with Parallax */}
-            <div
-                className="absolute inset-0 z-0"
-            >
+            {/* Background Video */}
+            <div className="absolute inset-0 z-0">
+                {/* Fallback Background Image (Shown if video fails or while loading) */}
                 <div
-                    className="w-full h-full bg-cover bg-center bg-no-repeat"
+                    className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
                     style={{
-                        backgroundImage: "url('https://images.unsplash.com/photo-1611085583191-a3b181a88401?q=80&w=2070&auto=format&fit=crop')",
+                        backgroundImage: "url('/assets/IMG_5830.MP4')",
                     }}
                 />
+
+                <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover"
+                    poster="/assets/IMG_5830.MP4"
+                >
+                    <source src="/assets/IMG_5830.MP4" type="video/mp4" />
+                </video>
             </div>
 
             {/* Gradient Overlay for Readability */}
@@ -62,7 +72,7 @@ const Hero = ({ onShopClick }) => {
                     </AnimatedButton>
 
                     <a
-                        href="https://wa.me/917304603610?text=Hi%20Sam%20Charmz,%20I'm%20interested%20in%20your%20jewelry" // Replace with actual number
+                        href="https://wa.me/916384110101?text=Hi%20Sam%20Charmz,%20I'm%20interested%20in%20your%20jewelry" // Replace with actual number
                         target="_blank"
                         rel="noopener noreferrer"
                         className="w-full sm:w-auto flex justify-center"

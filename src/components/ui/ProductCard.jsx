@@ -42,18 +42,28 @@ const ProductCard = ({ product, onProductClick }) => {
                     className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 z-10 relative ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
                 />
 
-                {/* Wishlist Button */}
-                <button
+                <motion.button
+                    initial={false}
+                    whileTap={{ scale: 0.8 }}
                     onClick={(e) => {
                         e.stopPropagation();
-                        toggleWishlist(product.id);
+                        toggleWishlist(product);
                     }}
-                    className="absolute top-3 right-3 z-20 p-2 rounded-full bg-white/80 backdrop-blur-md hover:bg-white shadow-sm transition-all hover:scale-110"
+                    aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                    className="absolute top-3 right-3 z-20 p-2 rounded-full bg-white/80 backdrop-blur-md hover:bg-white shadow-sm transition-colors"
                 >
-                    <Heart
-                        className={`w-4 h-4 transition-colors ${isWishlisted ? 'fill-red-500 stroke-red-500' : 'stroke-gray-900'}`}
-                    />
-                </button>
+                    <motion.div
+                        initial={false}
+                        animate={{
+                            scale: isWishlisted ? [1, 1.2, 1] : [1, 0.9, 1]
+                        }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <Heart
+                            className={`w-4 h-4 ${isWishlisted ? 'fill-red-500 stroke-red-500' : 'stroke-gray-900'}`}
+                        />
+                    </motion.div>
+                </motion.button>
 
                 {/* Quick Add Overlay */}
                 <div className="absolute inset-x-0 bottom-0 z-20 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex justify-center pb-6 bg-gradient-to-t from-black/60 to-transparent">

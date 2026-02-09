@@ -21,6 +21,9 @@ import AuthModal from './components/AuthModal';
 import MobileBottomNav from './components/MobileBottomNav';
 import MobileSearchBar from './components/ui/MobileSearchBar';
 
+// Integrated Background Animation
+import { BackgroundGradientAnimation } from './components/ui/background-gradient-animation';
+
 import { products } from './data/products';
 
 function App() {
@@ -76,6 +79,10 @@ function App() {
 
     return (
         <div className="relative min-h-screen text-brand-light bg-brand-dark overflow-x-hidden">
+            {/* Background Animation - Fixed to screen */}
+            <div className="fixed inset-0 z-0 opacity-40 pointer-events-none">
+                <BackgroundGradientAnimation containerClassName="h-full w-full" />
+            </div>
 
             {/* Drawers & Modals attached to Context State */}
             <CartDrawer />
@@ -83,6 +90,7 @@ function App() {
             <AuthModal />
 
             <div className="relative z-10 flex flex-col min-h-screen">
+
                 <Navbar
                     onSearch={handleSearchChange}
                     searchTerm={searchTerm}
@@ -130,6 +138,7 @@ function App() {
                     {currentView === 'home' && (
                         <div key="home" className="animate-fade-in">
                             {!searchTerm && <Hero onShopClick={() => handleNavigation('shop')} />}
+
 
                             {!searchTerm && <TrustSection />}
                             {!searchTerm && <Collections onCategoryClick={handleCategoryClick} />}
