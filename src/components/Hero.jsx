@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import AnimatedButton from './ui/AnimatedButton';
+import { ShinyButton } from './ui/ShinyButton';
 import { ArrowRight, MessageCircle, Star, ShieldCheck, Truck } from 'lucide-react';
 
 const Hero = ({ onShopClick }) => {
@@ -22,7 +22,7 @@ const Hero = ({ onShopClick }) => {
                 <div
                     className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
                     style={{
-                        backgroundImage: "url('/assets/IMG_5830.MP4')",
+                        backgroundImage: "url('/assets/banner video1.mp4')",
                     }}
                 />
 
@@ -32,9 +32,9 @@ const Hero = ({ onShopClick }) => {
                     muted
                     playsInline
                     className="absolute inset-0 w-full h-full object-cover"
-                    poster="/assets/IMG_5830.MP4"
+                    poster="/assets/banner video1.mp4"
                 >
-                    <source src="/assets/IMG_5830.MP4" type="video/mp4" />
+                    <source src="/assets/banner video1.mp4" type="video/mp4" />
                 </video>
             </div>
 
@@ -65,11 +65,11 @@ const Hero = ({ onShopClick }) => {
                 </p>
 
                 <div
-                    className="flex flex-col sm:flex-row gap-4 mt-8 w-full sm:w-auto px-6"
+                    className="flex flex-col sm:flex-row gap-4 mt-8 w-full sm:w-auto px-6 justify-center items-center"
                 >
-                    <AnimatedButton onClick={onShopClick} variant="primary" className="w-full sm:w-auto">
-                        Shop Collections <ArrowRight className="w-4 h-4" />
-                    </AnimatedButton>
+                    <ShinyButton onClick={onShopClick} className="w-full sm:w-auto !py-4">
+                        <span className="flex items-center gap-2">Shop Collections <ArrowRight className="w-4 h-4" /></span>
+                    </ShinyButton>
 
                     <a
                         href="https://wa.me/916384110101?text=Hi%20Sam%20Charmz,%20I'm%20interested%20in%20your%20jewelry" // Replace with actual number
@@ -77,22 +77,13 @@ const Hero = ({ onShopClick }) => {
                         rel="noopener noreferrer"
                         className="w-full sm:w-auto flex justify-center"
                     >
-                        <AnimatedButton variant="outline" className="w-full sm:w-auto">
-                            Order via WhatsApp <MessageCircle className="w-4 h-4 text-green-400" />
-                        </AnimatedButton>
+                        <ShinyButton className="w-full sm:w-auto !py-4" onClick={() => { }}>
+                            <span className="flex items-center gap-2">Order via WhatsApp <MessageCircle className="w-4 h-4 text-green-400" /></span>
+                        </ShinyButton>
                     </a>
                 </div>
 
-                {/* Trust Row - Mobile optimized */}
-                <div
-                    className="mt-12 md:mt-16 py-3 px-6 md:px-10 bg-white/10 backdrop-blur-md rounded-full border border-white/10 flex flex-wrap justify-center gap-4 md:gap-8 text-xs md:text-sm font-medium tracking-wide shadow-lg"
-                >
-                    <span className="flex items-center gap-2"><Star className="w-4 h-4 text-brand-gold fill-brand-gold" /> Handcrafted Quality</span>
-                    <span className="hidden md:inline text-white/40">•</span>
-                    <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-brand-teal" /> Premium Finish</span>
-                    <span className="hidden md:inline text-white/40">•</span>
-                    <span className="flex items-center gap-2"><Truck className="w-4 h-4 text-brand-teal" /> Fast Shipping</span>
-                </div>
+
             </div>
         </section>
     );

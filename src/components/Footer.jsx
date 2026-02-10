@@ -1,6 +1,6 @@
 import React from 'react';
 import { Instagram, Facebook, Twitter, Mail, Phone, MapPin, CreditCard, ShieldCheck, ArrowUp } from 'lucide-react';
-import AnimatedButton from './ui/AnimatedButton';
+import { ShinyButton } from './ui/ShinyButton';
 
 const Footer = ({ onPolicyClick }) => {
     const scrollToTop = () => {
@@ -81,11 +81,13 @@ const Footer = ({ onPolicyClick }) => {
                         <input
                             type="email"
                             placeholder="Your email address"
-                            className="w-full bg-white/5 border border-white/10 rounded-full px-6 py-3 text-sm text-white focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all placeholder:text-gray-500"
+                            className="w-full bg-white/5 border border-white/10 rounded-full px-6 py-4 text-sm text-white focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all placeholder:text-gray-500"
                         />
-                        <button className="absolute right-1 top-1 bottom-1 px-6 bg-brand-primary text-brand-dark rounded-full text-xs font-bold uppercase tracking-wider hover:bg-white transition-colors">
-                            Subscribe
-                        </button>
+                        <div className="absolute right-1 top-1 bottom-1 flex items-center">
+                            <ShinyButton className="!py-0 !px-6 !h-full !text-xs !font-bold !uppercase !tracking-wider !rounded-full">
+                                Subscribe
+                            </ShinyButton>
+                        </div>
                     </div>
                 </div>
             </div>

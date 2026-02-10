@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Heart, ShoppingBag, Plus, Minus } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
+import { ShinyButton } from './ui/ShinyButton';
 
 const ProductDetail = ({ product, onBack }) => {
     const { addToCart, toggleWishlist, wishlist } = useShop();
@@ -63,34 +64,36 @@ const ProductDetail = ({ product, onBack }) => {
 
                             {/* Actions */}
                             <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                                <div className="flex items-center border border-white/20 max-w-[120px] rounded-full overflow-hidden">
+                                <div className="flex items-center border border-white/20 max-w-[120px] rounded-full overflow-hidden h-[54px]">
                                     <button
                                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                        className="px-3 py-3 hover:bg-white/10 text-white"
+                                        className="px-3 h-full hover:bg-white/10 text-white"
                                     >
                                         <Minus className="w-4 h-4" />
                                     </button>
                                     <span className="flex-1 text-center font-medium text-white">{quantity}</span>
                                     <button
                                         onClick={() => setQuantity(quantity + 1)}
-                                        className="px-3 py-3 hover:bg-white/10 text-white"
+                                        className="px-3 h-full hover:bg-white/10 text-white"
                                     >
                                         <Plus className="w-4 h-4" />
                                     </button>
                                 </div>
 
                                 <div className="flex flex-1 gap-4">
-                                    <button
+                                    <ShinyButton
                                         onClick={handleAddToCart}
-                                        className="flex-1 bg-brand-primary text-brand-dark px-8 py-3 rounded-full uppercase tracking-widest hover:bg-white transition-colors flex items-center justify-center gap-2 font-bold shadow-[0_0_20px_rgba(212,175,55,0.3)]"
+                                        className="flex-1 w-full"
                                     >
-                                        <ShoppingBag className="w-4 h-4" /> Add to Cart
-                                    </button>
+                                        <span className="flex items-center justify-center gap-2">
+                                            <ShoppingBag className="w-4 h-4" /> Add to Cart
+                                        </span>
+                                    </ShinyButton>
                                     <motion.button
                                         whileTap={{ scale: 0.9 }}
                                         onClick={() => toggleWishlist(product)}
                                         aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-                                        className={`w-12 h-12 flex items-center justify-center border rounded-full ${isWishlisted ? 'border-brand-secondary text-brand-secondary bg-brand-secondary/10' : 'border-white/20 text-white hover:bg-white/10'} transition-colors shrink-0`}
+                                        className={`w-[54px] h-[54px] flex items-center justify-center border rounded-full ${isWishlisted ? 'border-brand-secondary text-brand-secondary bg-brand-secondary/10' : 'border-white/20 text-white hover:bg-white/10'} transition-colors shrink-0`}
                                     >
                                         <motion.div
                                             initial={false}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpDown } from 'lucide-react';
-import AnimatedButton from './ui/AnimatedButton';
+import { ShinyButton } from './ui/ShinyButton';
 import ProductCard from './ui/ProductCard';
 
 const categories = ["All", "Bracelets", "Hairbands"];
@@ -50,16 +50,13 @@ const ProductGrid = ({ products, isSearching, onProductClick, onViewAll, disable
                             {/* Category Filter */}
                             <div className="flex flex-wrap justify-center gap-2 p-1 bg-brand-surface rounded-full shadow-lg border border-white/10">
                                 {categories.map((cat) => (
-                                    <button
+                                    <ShinyButton
                                         key={cat}
                                         onClick={() => setActiveCategory(cat)}
-                                        className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${activeCategory === cat
-                                            ? 'bg-brand-primary text-brand-dark shadow-md font-bold'
-                                            : 'text-gray-400 hover:text-brand-light hover:bg-white/5'
-                                            }`}
+                                        className={`!py-2 !px-6 !text-sm !rounded-full ${activeCategory === cat ? '' : 'opacity-70 hover:opacity-100'}`}
                                     >
                                         {cat}
-                                    </button>
+                                    </ShinyButton>
                                 ))}
                             </div>
 
@@ -134,13 +131,12 @@ const ProductGrid = ({ products, isSearching, onProductClick, onViewAll, disable
                 }
 
                 <div className="text-center mt-20">
-                    <AnimatedButton
+                    <ShinyButton
                         onClick={onViewAll}
-                        variant="primary"
-                        className="mx-auto"
+                        className="mx-auto !py-4 !px-8"
                     >
                         View All Collections
-                    </AnimatedButton>
+                    </ShinyButton>
                 </div>
             </div >
         </section >

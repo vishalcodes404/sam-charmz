@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShoppingBag, Trash2, Plus, Minus } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
+import { ShinyButton } from './ui/ShinyButton';
 
 const CartDrawer = () => {
     const {
@@ -114,12 +115,12 @@ const CartDrawer = () => {
                                     <span className="font-sans text-gray-400">Subtotal</span>
                                     <span className="font-serif text-xl text-brand-primary font-bold">₹{totalPrice.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
                                 </div>
-                                <button
+                                <ShinyButton
                                     onClick={() => alert("Checkout not implemented yet")}
-                                    className="w-full bg-brand-primary text-brand-dark py-4 rounded-xl uppercase font-bold tracking-widest text-sm hover:bg-white transition-colors shadow-lg shadow-brand-primary/20"
+                                    className="w-full !py-4 !text-sm !font-bold !uppercase !tracking-widest shadow-lg shadow-brand-primary/20"
                                 >
                                     Checkout
-                                </button>
+                                </ShinyButton>
                             </div>
                         )}
                     </motion.div>

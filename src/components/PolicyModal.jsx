@@ -15,7 +15,7 @@ const PolicyModal = ({ isOpen, onClose, defaultTab = 'about' }) => {
     const content = {
         about: (
             <div className="space-y-4">
-                <h3 className="font-serif text-2xl italic mb-4">The Sam Charmz Story</h3>
+                <h3 className="font-serif text-2xl italic mb-4 text-brand-dark">The Sam Charmz Story</h3>
                 <p>Welcome to Sam Charmz, your premier destination for exquisite jewelry aimed at defining elegance and sophistication. Established with a passion for beauty and craftsmanship, we curate collections that speak to the modern individual who cherishes tradition yet embraces contemporary style.</p>
                 <p>Each piece in our collection is handpicked for its unique design and superior quality. From delicate bracelets that whisper grace to statement hairbands that crown your look, we believe in the power of accessories to transform and empower.</p>
                 <p>Our commitment extends beyond just selling jewelry; we strive to provide an experience—one of luxury, trust, and delight.</p>
@@ -23,14 +23,14 @@ const PolicyModal = ({ isOpen, onClose, defaultTab = 'about' }) => {
         ),
         shipping: (
             <div className="space-y-4">
-                <h3 className="font-serif text-2xl italic mb-4">Shipping & Delivery</h3>
+                <h3 className="font-serif text-2xl italic mb-4 text-brand-dark">Shipping & Delivery</h3>
                 <ul className="list-disc pl-5 space-y-2">
                     <li><strong>Fast Processing:</strong> All orders are processed within 24 hours of confirmation.</li>
                     <li><strong>Insured Shipping:</strong> We provide fully insured shipping for all our jewelry to ensure it reaches you safely.</li>
                     <li><strong>Delivery Time:</strong> Standard delivery takes 3-5 business days. Express shipping options are available at checkout.</li>
                     <li><strong>Tracking:</strong> Once shipped, you will receive a tracking number via email/SMS to monitor your package's journey.</li>
                 </ul>
-                <h3 className="font-serif text-2xl italic mt-8 mb-4">Returns & Exchanges</h3>
+                <h3 className="font-serif text-2xl italic mt-8 mb-4 text-brand-dark">Returns & Exchanges</h3>
                 <p>We want you to love your purchase. If for any reason you are not completely satisfied, we offer a hassle-free <strong>7-day return policy</strong>.</p>
                 <ul className="list-disc pl-5 space-y-2">
                     <li>Items must be unused and in original packaging with tags intact.</li>
@@ -41,7 +41,7 @@ const PolicyModal = ({ isOpen, onClose, defaultTab = 'about' }) => {
         ),
         payment: (
             <div className="space-y-4">
-                <h3 className="font-serif text-2xl italic mb-4">Secure Payments</h3>
+                <h3 className="font-serif text-2xl italic mb-4 text-brand-dark">Secure Payments</h3>
                 <p>Your security is our top priority. We use industry-standard encryption to protect your personal and financial information.</p>
                 <div className="bg-green-50 p-4 border border-green-100 rounded-lg flex items-start gap-3">
                     <Shield className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
@@ -50,7 +50,7 @@ const PolicyModal = ({ isOpen, onClose, defaultTab = 'about' }) => {
                         <p className="text-green-700 text-sm">Our website is secured with 256-bit SSL encryption. We do not store your credit card details.</p>
                     </div>
                 </div>
-                <h4 className="font-bold mt-6 mb-2">Accepted Payment Methods</h4>
+                <h4 className="font-bold mt-6 mb-2 text-brand-dark">Accepted Payment Methods</h4>
                 <div className="flex gap-4">
                     {['Visa', 'Mastercard', 'UPI', 'Net Banking', 'Wallets'].map(method => (
                         <span key={method} className="bg-gray-100 px-3 py-1 rounded text-sm text-gray-600">{method}</span>
@@ -60,7 +60,7 @@ const PolicyModal = ({ isOpen, onClose, defaultTab = 'about' }) => {
         ),
         terms: (
             <div className="space-y-4">
-                <h3 className="font-serif text-2xl italic mb-4">Terms of Service</h3>
+                <h3 className="font-serif text-2xl italic mb-4 text-brand-dark">Terms of Service</h3>
                 <p>By accessing this website, you agree to be bound by these terms and conditions.</p>
                 <p><strong>Product Accuracy:</strong> We aim to display colors and images as accurately as possible, but cannot guarantee that your monitor's display will be exact.</p>
                 <p><strong>Pricing:</strong> Prices are subject to change without notice. We reserve the right to modify or discontinue services/products at any time.</p>
@@ -87,7 +87,7 @@ const PolicyModal = ({ isOpen, onClose, defaultTab = 'about' }) => {
                         className="fixed right-0 top-0 bottom-0 w-full max-w-2xl bg-white z-[101] shadow-2xl flex flex-col"
                     >
                         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white">
-                            <h2 className="font-serif text-2xl italic">Information & Policies</h2>
+                            <h2 className="font-serif text-2xl italic text-brand-dark">Information & Policies</h2>
                             <button onClick={onClose} className="hover:bg-gray-100 p-2 rounded-full transition-colors">
                                 <X className="w-6 h-6" />
                             </button>

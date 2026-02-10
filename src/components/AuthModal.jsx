@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, Mail, Lock, Calendar, ArrowRight, Loader2, Check } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
+import { ShinyButton } from './ui/ShinyButton';
 
 const AuthModal = () => {
     const { isAuthOpen, closeAuth, login } = useShop();
@@ -225,18 +226,18 @@ const AuthModal = () => {
                                                 </div>
                                             )}
 
-                                            <button
+                                            <ShinyButton
                                                 type="submit"
                                                 disabled={isLoading}
-                                                className="w-full bg-brand-primary text-brand-dark py-3 rounded-xl uppercase text-xs font-bold tracking-widest hover:bg-white transition-colors flex items-center justify-center gap-2 mt-6 shadow-lg shadow-brand-primary/20"
+                                                className="w-full !py-3 !text-xs !font-bold !tracking-widest !uppercase mt-6 shadow-lg shadow-brand-primary/20"
                                             >
-                                                {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
-                                                    <>
+                                                {isLoading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : (
+                                                    <span className="flex items-center justify-center gap-2">
                                                         {view === 'login' ? 'Sign In' : view === 'signup' ? 'Create Account' : 'Send Instructions'}
                                                         <ArrowRight className="w-4 h-4" />
-                                                    </>
+                                                    </span>
                                                 )}
-                                            </button>
+                                            </ShinyButton>
                                         </form>
                                     </>
                                 )}

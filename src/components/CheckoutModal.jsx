@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Lock, CheckCircle, CreditCard, Loader2 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
+import { ShinyButton } from './ui/ShinyButton';
 
 const CheckoutModal = ({ isOpen, onClose }) => {
     const { cart } = useShop();
@@ -95,9 +96,9 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                                             <p className="text-sm text-gray-500">Total amount to pay</p>
                                             <p className="font-serif text-2xl font-bold">₹{total.toLocaleString()}</p>
                                         </div>
-                                        <button type="submit" className="bg-black text-white px-8 py-4 uppercase tracking-widest text-sm hover:bg-gray-800 transition-colors flex items-center gap-2">
+                                        <ShinyButton type="submit" className="!px-8 !py-4 !uppercase !tracking-widest !text-sm flex items-center gap-2">
                                             <Lock className="w-4 h-4" /> Pay Securely
-                                        </button>
+                                        </ShinyButton>
                                     </div>
                                 </form>
                             )}
@@ -123,9 +124,9 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                                     <p className="text-gray-600 mb-8 max-w-md mx-auto">
                                         Your order has been successfully placed. You will receive a confirmation email shortly with your order details and tracking number.
                                     </p>
-                                    <button onClick={onClose} className="bg-black text-white px-8 py-3 uppercase tracking-widest text-sm hover:bg-gray-800 transition-colors">
+                                    <ShinyButton onClick={onClose} className="!px-8 !py-3 !uppercase !tracking-widest !text-sm">
                                         Continue Shopping
-                                    </button>
+                                    </ShinyButton>
                                 </div>
                             )}
                         </div>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Check, Heart } from 'lucide-react';
 import { useShop } from '../../context/ShopContext';
+import { ShinyButton } from './ShinyButton';
 
 const ProductCard = ({ product, onProductClick }) => {
     const { addToCart, toggleWishlist, wishlist } = useShop();
@@ -67,22 +68,20 @@ const ProductCard = ({ product, onProductClick }) => {
 
                 {/* Quick Add Overlay */}
                 <div className="absolute inset-x-0 bottom-0 z-20 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex justify-center pb-6 bg-gradient-to-t from-black/60 to-transparent">
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            handleAddToCart();
-                        }}
-                        className={`flex items-center gap-2 px-6 py-2 rounded-full font-medium text-sm shadow-lg backdrop-blur-md transition-all ${isAdded
-                            ? 'bg-brand-secondary text-white'
-                            : 'bg-brand-light text-brand-dark hover:bg-brand-primary hover:text-brand-dark'
-                            }`}
-                    >
-                        {isAdded ? (
-                            <><Check className="w-4 h-4" /> Added</>
-                        ) : (
-                            <><Plus className="w-4 h-4" /> Quick Add</>
-                        )}
-                    </button>
+                    <div onClick={(e) => e.stopPropagation()}>
+                        <ShinyButton
+                            onClick={handleAddToCart}
+                            className={`!py-2 !px-6 !text-sm`}
+                        >
+                            <span className="flex items-center gap-2">
+                                {isAdded ? (
+                                    <><Check className="w-4 h-4" /> Added</>
+                                ) : (
+                                    <><Plus className="w-4 h-4" /> Quick Add</>
+                                )}
+                            </span>
+                        </ShinyButton>
+                    </div>
                 </div>
             </div>
 

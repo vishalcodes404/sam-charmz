@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShoppingBag, Trash2 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
+import { ShinyButton } from './ui/ShinyButton';
 
 const WishlistDrawer = () => {
     const {
@@ -72,12 +73,12 @@ const WishlistDrawer = () => {
                                                 </div>
 
                                                 <div className="flex gap-3 mt-4">
-                                                    <button
+                                                    <ShinyButton
                                                         onClick={() => moveToCart(item)}
-                                                        className="flex-1 bg-brand-primary text-brand-dark text-xs uppercase font-bold tracking-widest py-2 px-4 hover:bg-white transition-colors rounded-lg"
+                                                        className="flex-1 !py-2 !px-4 !text-xs !uppercase !font-bold !tracking-widest"
                                                     >
                                                         Add to Cart
-                                                    </button>
+                                                    </ShinyButton>
                                                     <button
                                                         onClick={() => toggleWishlist(item)}
                                                         className="p-2 text-gray-400 hover:text-red-400 border border-white/10 hover:border-red-400/30 transition-colors rounded-lg hover:bg-red-400/10"
