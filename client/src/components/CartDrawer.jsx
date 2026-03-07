@@ -1,0 +1,133 @@
+import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, ShoppingBag, Trash2, Plus, Minus } from 'lucide-react';
+import { useShop } from '../context/ShopContext';
+import { ShinyButton } from './ui/ShinyButton';
+
+const CartDrawer = () => {
+    const {
+        isCartOpen, closeCart,
+        cart, removeFromCart, updateQuantity
+    } = useShop();
+
+    const totalPrice = cart.reduce((total, item) => {
+        const price = parseFloat(item.price.replace(/[₹,]/g, ''));
+        return total + price * (item.quantity || 1);
+    }, 0);
+
+    return (
+        <AnimatePresence>
+            {isCartOpen && (
+                <>
+                    {/* Backdrop */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={closeCart}
+                        className="fixed inset-0 bg-black/20 z-[60] backdrop-blur-sm"
+                    />
+
+                    {/* Drawer */}
+                    <motion.div
+                        initial={{ x: '100%' }}
+                        animate={{ x: 0 }}
+                        exit={{ x: '100%' }}
+                        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                        className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-brand-surface z-[70] shadow-2xl flex flex-col border-l border-brand-light/10"
+                    >
+                        {/* Header */}
+                        <div className="p-6 border-b border-brand-light/10 flex justify-between items-center bg-brand-surface">
+                            <h2 className="font-serif text-2xl italic text-brand-light">Shopping Cart ({cart.length})</h2>
+                            <button
+                                onClick={closeCart}
+                                className="p-2 hover:bg-brand-light/10 rounded-full transition-colors text-brand-gray hover:text-brand-light"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 overflow-y-auto p-6">
+                            {cart.length === 0 ? (
+                                <div className="h-full flex flex-col items-center justify-center text-center text-brand-gray gap-4">
+                                    <ShoppingBag className="w-16 h-16 opacity-20" />
+                                    <p className="font-sans text-lg">Your cart is empty.</p>
+                                    <button
+                                        onClick={closeCart}
+                                        className="text-brand-primary border-b border-brand-primary text-sm uppercase tracking-wide mt-2 hover:text-brand-light hover:border-brand-light transition-colors"
+                                    >
+                                        Continue Shopping
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col gap-6">
+                                    {cart.map(item => (
+                                        <div key={item.id} className="flex gap-4 p-3 hover:bg-brand-light/5 rounded-xl transition-colors group border border-transparent hover:border-brand-light/10">
+                                            <div className="w-24 h-24 flex-shrink-0 bg-brand-light/5 rounded-lg overflow-hidden">
+                                                <img
+                                                    src={item.image}
+                                                    alt={item.name}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                            <div className="flex-1 flex flex-col justify-between">
+                                                <div>
+                                                    <h3 className="font-serif text-lg leading-tight mb-1 text-brand-light">{item.name}</h3>
+                                                    <p className="font-sans text-sm text-brand-primary">{item.price}</p>
+                                                </div>
+
+                                                <div className="flex items-center justify-between mt-4">
+                                                    <div className="flex items-center gap-3 border border-brand-light/20 rounded-lg px-2 py-1 bg-brand-light/5">
+                                                        <button
+                                                            onClick={() => updateQuantity(item.id, -1)}
+                                                            disabled={item.quantity <= 1}
+                                                            className="text-brand-gray hover:text-brand-light disabled:opacity-30 p-1"
+                                                        >
+                                                            <Minus className="w-3 h-3" />
+                                                        </button>
+                                                        <span className="text-sm font-medium w-6 text-center text-brand-light">{item.quantity || 1}</span>
+                                                        <button
+                                                            onClick={() => updateQuantity(item.id, 1)}
+                                                            className="text-brand-gray hover:text-brand-light p-1"
+                                                        >
+                                                            <Plus className="w-3 h-3" />
+                                                        </button>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => removeFromCart(item.id)}
+                                                        className="p-2 text-brand-gray hover:text-red-500 border border-brand-light/10 hover:border-red-500/30 transition-colors rounded-lg hover:bg-red-500/10"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Footer */}
+                        {cart.length > 0 && (
+                            <div className="p-6 border-t border-brand-light/10 bg-brand-surface backdrop-blur-md">
+                                <div className="flex justify-between items-center mb-4">
+                                    <span className="font-sans text-brand-gray">Subtotal</span>
+                                    <span className="font-serif text-xl text-brand-primary font-bold">₹{totalPrice.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
+                                </div>
+                                <ShinyButton
+                                    onClick={() => alert("Checkout not implemented yet")}
+                                    className="w-full !py-4 !text-sm !font-bold !uppercase !tracking-widest shadow-lg shadow-brand-primary/20"
+                                >
+                                    Checkout
+                                </ShinyButton>
+                            </div>
+                        )}
+                    </motion.div>
+                </>
+            )}
+        </AnimatePresence>
+    );
+};
+
+export default CartDrawer;
