@@ -27,11 +27,11 @@ export default {
                 'blob1': 'blobFloat1 25s infinite ease-in-out alternate',
                 'blob2': 'blobFloat2 28s infinite ease-in-out alternate',
                 'blob3': 'blobFloat3 22s infinite ease-in-out alternate',
-                first: "moveVertical 60s ease infinite",
-                second: "moveInCircle 60s reverse infinite",
-                third: "moveInCircle 60s linear infinite",
-                fourth: "moveHorizontal 60s ease infinite",
-                fifth: "moveInCircle 60s ease infinite",
+                first: "moveVertical 20s ease infinite",
+                second: "moveInCircle 18s reverse infinite",
+                third: "moveInCircle 15s linear infinite",
+                fourth: "moveHorizontal 19s ease infinite",
+                fifth: "moveInCircle 17s ease infinite",
             },
             keyframes: {
                 'gradient-flow': {

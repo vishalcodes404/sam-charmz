@@ -38,7 +38,7 @@ export function AdminProvider({ children }) {
         const seeded = defaultProducts.map(p => migrateImages({
             ...p,
             description: p.description || '',
-            price: typeof p.price === 'string' ? parseFloat(p.price.replace(/[₹,]/g, '')) : p.price,
+            price: typeof p.price === 'string' ? parseFloat(p.price.replace(/[₹,]/g, '')) : (p.price || 0),
         }));
         localStorage.setItem('admin_products', JSON.stringify(seeded));
         return seeded;

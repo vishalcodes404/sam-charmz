@@ -1,0 +1,49 @@
+/* Gradient Background Animation */
+.preloader-gradient-bg {
+    background-size: 300% 300%;
+    animation: preloader-gradient-pan 8s ease-in-out infinite alternate;
+}
+
+@keyframes preloader-gradient-pan {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes preloader-fade-in {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-preloader-fade-in {
+    animation: preloader-fade-in 1.5s ease-out forwards;
+}
+
+@keyframes preloader-minimal-bar {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.animate-preloader-minimal-bar {
+    animation: preloader-minimal-bar 2.5s ease-in-out infinite;
+}

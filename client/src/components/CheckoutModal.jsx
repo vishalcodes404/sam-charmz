@@ -7,7 +7,7 @@ import { ShinyButton } from './ui/ShinyButton';
 const CheckoutModal = ({ isOpen, onClose }) => {
     const { cart, dispatch } = useShop();
     const total = cart.reduce((acc, item) => {
-        const price = typeof item.price === 'number' ? item.price : parseFloat(item.price.replace(/[₹,]/g, ''));
+        const price = parseFloat(String(item.price || '0').replace(/[₹,]/g, ''));
         return acc + price * (item.quantity || 1);
     }, 0);
 

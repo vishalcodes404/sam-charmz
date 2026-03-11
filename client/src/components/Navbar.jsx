@@ -2,12 +2,28 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, ShoppingBag, User, Menu, X, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useShop } from '../context/ShopContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Navbar = ({ onSearch, searchTerm, onLogoClick, onShopClick }) => {
+    const navigate = useNavigate();
+    const location = useLocation();
     const {
         cart, wishlist, user,
         openCart, openWishlist, openAuth
     } = useShop();
+
+    const handleOurStoryClick = (e) => {
+        if (e) e.preventDefault();
+
+        if (location.pathname !== '/') {
+            navigate('/');
+            setTimeout(() => {
+                document.getElementById('brand-story')?.scrollIntoView({ behavior: 'smooth' });
+            }, 300);
+        } else {
+            document.getElementById('brand-story')?.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
 
     const cartCount = cart.reduce((acc, item) => acc + (item.quantity || 1), 0);
     const wishlistCount = wishlist.length;
@@ -71,8 +87,8 @@ const Navbar = ({ onSearch, searchTerm, onLogoClick, onShopClick }) => {
                     <div className="hidden lg:flex items-center gap-8 mx-auto">
                         <NavLink onClick={onLogoClick} text="Home" />
                         <NavLink onClick={onShopClick} text="Collections" />
-                        <NavLink onClick={() => { onLogoClick(); /* Add navigation to orders here when available */ }} text="Order Details" />
-                        <NavLink href="#brand-story" text="Our Story" />
+                        <NavLink onClick={() => { onLogoClick(); navigate('/orders'); }} text="Order Details" />
+                        <NavLink onClick={handleOurStoryClick} text="Our Story" />
                     </div>
 
                     {/* Right Icons & Actions */}
@@ -149,8 +165,8 @@ const Navbar = ({ onSearch, searchTerm, onLogoClick, onShopClick }) => {
                             <MobileNavLink onClick={() => { setIsMobileMenuOpen(false); onLogoClick(); }} text="Home" delay={0.1} />
                             <MobileNavLink onClick={() => { setIsMobileMenuOpen(false); onShopClick(); }} text="Collections" delay={0.2} />
                             <MobileNavLink onClick={() => { setIsMobileMenuOpen(false); openWishlist(); }} text="Wishlist" delay={0.25} />
-                            <MobileNavLink onClick={() => { setIsMobileMenuOpen(false); /* Add navigation to orders here when available */ }} text="Order Details" delay={0.3} />
-                            <MobileNavLink href="#brand-story" onClick={() => setIsMobileMenuOpen(false)} text="Our Story" delay={0.4} />
+                            <MobileNavLink onClick={() => { setIsMobileMenuOpen(false); navigate('/orders'); }} text="Order Details" delay={0.3} />
+                            <MobileNavLink onClick={(e) => { setIsMobileMenuOpen(false); handleOurStoryClick(e); }} text="Our Story" delay={0.4} />
 
                             <motion.button
                                 initial={{ opacity: 0, y: 20 }}

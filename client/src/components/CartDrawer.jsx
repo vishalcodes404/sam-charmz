@@ -11,7 +11,8 @@ const CartDrawer = () => {
     } = useShop();
 
     const totalPrice = cart.reduce((total, item) => {
-        const price = parseFloat(item.price.replace(/[₹,]/g, ''));
+        const priceString = String(item.price || '0');
+        const price = parseFloat(priceString.replace(/[₹,]/g, ''));
         return total + price * (item.quantity || 1);
     }, 0);
 

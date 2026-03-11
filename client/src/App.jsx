@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { useShop } from './context/ShopContext';
 import { useAdmin } from './context/AdminContext';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
@@ -18,11 +18,14 @@ import MobileSearchBar from './components/ui/MobileSearchBar';
 // Integrated Background Animation
 import SlowBackground from './components/ui/SlowBackground';
 
+import Preloader from './components/Preloader';
+
 // Pages
-import HomePage from './pages/HomePage';
-import ShopPage from './pages/ShopPage';
-import ProductPage from './pages/ProductPage';
-import AdminPage from './pages/AdminPage';
+const HomePage = lazy(() => import('./pages/HomePage'));
+const ShopPage = lazy(() => import('./pages/ShopPage'));
+const ProductPage = lazy(() => import('./pages/ProductPage'));
+const AdminPage = lazy(() => import('./pages/AdminPage'));
+const OrdersPage = lazy(() => import('./pages/OrdersPage'));
 
 function App() {
     const navigate = useNavigate();
@@ -79,11 +82,14 @@ function App() {
     if (location.pathname.startsWith('/admin')) {
         return (
             <div className="relative min-h-screen text-brand-light bg-brand-dark overflow-x-hidden">
+                <Preloader />
                 <SlowBackground />
                 <div className="relative z-10 flex flex-col min-h-screen">
-                    <Routes>
-                        <Route path="/admin/*" element={<AdminPage />} />
-                    </Routes>
+                    <Suspense fallback={<div className="h-screen w-full flex items-center justify-center tracking-widest uppercase font-sans text-xs text-brand-gray">Loading...</div>}>
+                        <Routes>
+                            <Route path="/admin/*" element={<AdminPage />} />
+                        </Routes>
+                    </Suspense>
                 </div>
             </div>
         );
@@ -91,6 +97,7 @@ function App() {
 
     return (
         <div className="relative min-h-screen text-brand-light bg-brand-dark overflow-x-hidden">
+            <Preloader />
             {/* Background Animation - Fixed to screen */}
             <SlowBackground />
 
@@ -130,11 +137,14 @@ function App() {
                 />
 
                 <div className="min-h-screen">
-                    <Routes>
-                        <Route path="/" element={<HomePage searchTerm={searchTerm} filteredProducts={filteredProducts} />} />
-                        <Route path="/shop" element={<ShopPage searchTerm={searchTerm} />} />
-                        <Route path="/product/:id" element={<ProductPage />} />
-                    </Routes>
+                    <Suspense fallback={<div className="h-screen w-full flex items-center justify-center tracking-widest uppercase font-sans text-xs text-brand-gray">Loading...</div>}>
+                        <Routes>
+                            <Route path="/" element={<HomePage searchTerm={searchTerm} filteredProducts={filteredProducts} />} />
+                            <Route path="/shop" element={<ShopPage searchTerm={searchTerm} />} />
+                            <Route path="/product/:id" element={<ProductPage />} />
+                            <Route path="/orders" element={<OrdersPage />} />
+                        </Routes>
+                    </Suspense>
                 </div>
 
                 <div id="footer">

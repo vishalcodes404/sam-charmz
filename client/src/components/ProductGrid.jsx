@@ -27,8 +27,8 @@ const ProductGrid = ({ products, isSearching, onProductClick, onViewAll, disable
     const sortedProducts = [...categoryFiltered].sort((a, b) => {
         if (sortBy === "Default") return 0;
 
-        const priceA = parseFloat(a.price.replace(/[₹,]/g, ''));
-        const priceB = parseFloat(b.price.replace(/[₹,]/g, ''));
+        const priceA = parseFloat(String(a.price || '0').replace(/[₹,]/g, ''));
+        const priceB = parseFloat(String(b.price || '0').replace(/[₹,]/g, ''));
 
         if (sortBy === "Price: Low to High") return priceA - priceB;
         if (sortBy === "Price: High to Low") return priceB - priceA;
