@@ -138,24 +138,23 @@ export default function AdminCategories() {
     const handleAdd = () => { setEditTarget(null); setModalOpen(true); };
     const handleEdit = (cat) => { setEditTarget(cat); setModalOpen(true); };
 
-    const handleSave = ({ name, image }) => {
+    const handleSave = async ({ name, image }) => {
         if (editTarget?.id) {
-            editCategory(editTarget.id, { name, image });
-            showSuccess(`Category "${name}" updated!`);
+            const result = await editCategory(editTarget.id, { name, image });
+            if (result.success) showSuccess(`Category "${name}" updated!`);
         } else {
-            const result = addCategory(name, image);
+            const result = await addCategory(name, image);
             if (result.success) {
                 showSuccess(`Category "${name}" added!`);
             } else {
-                // re-open modal won't work easily, just show toast
                 return;
             }
         }
         setModalOpen(false);
     };
 
-    const handleDelete = (cat) => {
-        const result = deleteCategory(cat.id);
+    const handleDelete = async (cat) => {
+        const result = await deleteCategory(cat.id);
         if (!result.success) {
             setDeleteError(prev => ({ ...prev, [cat.id]: result.error }));
             setTimeout(() => setDeleteError(prev => { const n = { ...prev }; delete n[cat.id]; return n; }), 4000);

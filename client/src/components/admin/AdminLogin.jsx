@@ -13,8 +13,7 @@ export default function AdminLogin() {
         e.preventDefault();
         setError('');
         setLoading(true);
-        await new Promise(r => setTimeout(r, 500)); // small UX delay
-        const result = adminLogin(email, password);
+        const result = await adminLogin(email, password);
         if (!result.success) setError(result.error);
         setLoading(false);
     };

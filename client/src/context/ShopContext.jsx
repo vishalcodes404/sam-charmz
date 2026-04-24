@@ -1,11 +1,12 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useState } from 'react';
+import { supabase } from '../lib/supabaseClient';
 
 const ShopContext = createContext();
 
 const initialState = {
     cart: [],
     wishlist: [],
-    user: null, // { name, email, isLoggedIn }
+    user: null, // Supabase user object with added firstName/lastName
     isCartOpen: false,
     isWishlistOpen: false,
     isAuthOpen: false,
@@ -88,8 +89,8 @@ const shopReducer = (state, action) => {
         }
 
         // Auth Actions
-        case 'LOGIN':
-            return { ...state, user: { ...action.payload, isLoggedIn: true }, isAuthOpen: false };
+        case 'SET_USER':
+            return { ...state, user: action.payload, isAuthOpen: action.payload ? false : state.isAuthOpen };
         case 'LOGOUT':
             return { ...state, user: null };
 
@@ -115,32 +116,64 @@ const shopReducer = (state, action) => {
     }
 };
 
+// Helper: extract a friendly user object from Supabase session user
+function extractUser(supabaseUser) {
+    if (!supabaseUser) return null;
+    const meta = supabaseUser.user_metadata || {};
+    return {
+        id: supabaseUser.id,
+        email: supabaseUser.email,
+        firstName: meta.first_name || meta.full_name?.split(' ')[0] || meta.name?.split(' ')[0] || '',
+        lastName: meta.last_name || meta.full_name?.split(' ').slice(1).join(' ') || '',
+        avatarUrl: meta.avatar_url || meta.picture || '',
+        isLoggedIn: true,
+    };
+}
+
 export const ShopProvider = ({ children }) => {
     const [state, dispatch] = useReducer(shopReducer, initialState);
+    const [authLoading, setAuthLoading] = useState(true);
 
-    // Persistence Init
+    // ─── Supabase Auth Listener ───
+    useEffect(() => {
+        // 1. Check existing session on mount
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            dispatch({ type: 'SET_USER', payload: extractUser(session?.user ?? null) });
+            setAuthLoading(false);
+        });
+
+        // 2. Listen for auth changes (login, logout, token refresh)
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+            (_event, session) => {
+                dispatch({ type: 'SET_USER', payload: extractUser(session?.user ?? null) });
+                setAuthLoading(false);
+            }
+        );
+
+        return () => subscription.unsubscribe();
+    }, []);
+
+    // ─── Cart/Wishlist Persistence (localStorage — device-level, not account-level) ───
     useEffect(() => {
         const localData = localStorage.getItem('samCharmzState');
         if (localData) {
             try {
                 const parsed = JSON.parse(localData);
-                dispatch({ type: 'INIT_STATE', payload: parsed });
+                // Only restore cart & wishlist, NOT user (user comes from Supabase)
+                dispatch({ type: 'INIT_STATE', payload: { cart: parsed.cart, wishlist: parsed.wishlist } });
             } catch (e) {
                 console.error("Failed to parse local storage", e);
             }
         }
     }, []);
 
-    // Persistence Update
     useEffect(() => {
-        // Only save data, not UI state (don't want to re-open drawers on refresh)
         const dataToSave = {
             cart: state.cart,
             wishlist: state.wishlist,
-            user: state.user
         };
         localStorage.setItem('samCharmzState', JSON.stringify(dataToSave));
-    }, [state.cart, state.wishlist, state.user]);
+    }, [state.cart, state.wishlist]);
 
     // Cleanup Listener
     useEffect(() => {
@@ -161,8 +194,12 @@ export const ShopProvider = ({ children }) => {
     const toggleWishlist = (product) => dispatch({ type: 'TOGGLE_WISHLIST', payload: product });
     const moveToCart = (product) => dispatch({ type: 'MOVE_TO_CART', payload: product });
 
-    const login = (userData) => dispatch({ type: 'LOGIN', payload: userData });
-    const logout = () => dispatch({ type: 'LOGOUT' });
+    // Auth is handled by Supabase — these are convenience wrappers
+    const login = (userData) => dispatch({ type: 'SET_USER', payload: userData });
+    const logout = async () => {
+        await supabase.auth.signOut();
+        dispatch({ type: 'LOGOUT' });
+    };
 
     const openCart = () => dispatch({ type: 'SET_CART_OPEN', payload: true });
     const closeCart = () => dispatch({ type: 'SET_CART_OPEN', payload: false });
@@ -175,6 +212,7 @@ export const ShopProvider = ({ children }) => {
 
     const value = {
         ...state,
+        authLoading,
         addToCart,
         removeFromCart,
         updateQuantity,

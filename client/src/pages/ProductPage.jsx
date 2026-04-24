@@ -8,7 +8,18 @@ import Testimonials from '../components/Testimonials';
 const ProductPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { products } = useAdmin();
+    const { products, loading } = useAdmin();
+
+    if (loading) {
+        return (
+            <div className="pt-24 min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="w-8 h-8 border-2 border-brand-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-brand-gray text-sm uppercase tracking-widest">Loading product...</p>
+                </div>
+            </div>
+        );
+    }
 
     // Find the product by id or slug (loose equality handles string/number mismatch)
     const product = products.find(p => String(p.id) === String(id) || p.slug === id);

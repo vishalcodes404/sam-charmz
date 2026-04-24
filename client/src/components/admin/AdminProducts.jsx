@@ -30,9 +30,11 @@ function ProductModal({ isOpen, onClose, onSave, initial, categoryNames }) {
         return Object.keys(e).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (validate()) onSave(form);
+        if (validate()) {
+            onSave(form);
+        }
     };
 
     const handleFileSelect = (e) => {
@@ -263,14 +265,21 @@ export default function AdminProducts() {
         return matchSearch && matchCat;
     });
 
+    const [saving, setSaving] = useState(false);
+
     const handleAdd = () => { setEditTarget(null); setModalOpen(true); };
     const handleEdit = (p) => { setEditTarget(p); setModalOpen(true); };
-    const handleSave = (form) => {
-        if (editTarget?.id) editProduct(editTarget.id, form);
-        else addProduct(form);
+    const handleSave = async (form) => {
+        setSaving(true);
+        if (editTarget?.id) await editProduct(editTarget.id, form);
+        else await addProduct(form);
+        setSaving(false);
         setModalOpen(false);
     };
-    const handleDelete = () => { deleteProduct(deleteTarget.id); setDeleteTarget(null); };
+    const handleDelete = async () => {
+        await deleteProduct(deleteTarget.id);
+        setDeleteTarget(null);
+    };
 
     // Helper: get display image (backward compat)
     const getThumb = (p) => (p.images?.[0] || p.image || '');

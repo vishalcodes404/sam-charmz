@@ -7,7 +7,7 @@ import ProductCard from './ui/ProductCard';
 const sortOptions = ["Default", "Price: Low to High", "Price: High to Low"];
 
 const Shop = ({ onProductClick, initialCategory, searchTerm = "" }) => {
-    const { products, categoryNames: adminCategories } = useAdmin();
+    const { products, categoryNames: adminCategories, loading } = useAdmin();
     const categories = ['All', ...adminCategories];
     const [activeCategory, setActiveCategory] = useState(initialCategory || "All");
     const [sortBy, setSortBy] = useState("Default");
@@ -15,6 +15,17 @@ const Shop = ({ onProductClick, initialCategory, searchTerm = "" }) => {
     const [priceRange, setPriceRange] = useState({ min: 0, max: 2000 });
 
     const [isSortOpen, setIsSortOpen] = useState(false);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen pt-24 pb-20 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="w-8 h-8 border-2 border-brand-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-brand-gray text-sm uppercase tracking-widest">Loading products...</p>
+                </div>
+            </div>
+        );
+    }
 
     // Filter Logic
     const filteredProducts = products.filter(product => {
