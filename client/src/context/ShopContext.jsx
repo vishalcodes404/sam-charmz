@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect, useState } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useState, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
 const ShopContext = createContext();
@@ -51,8 +51,12 @@ const shopReducer = (state, action) => {
             };
         case 'CLEAR_CART':
             return { ...state, cart: [] };
+        case 'SET_CART':
+            return { ...state, cart: Array.isArray(action.payload) ? action.payload : [] };
 
         // Wishlist Actions
+        case 'SET_WISHLIST':
+            return { ...state, wishlist: Array.isArray(action.payload) ? action.payload : [] };
         case 'TOGGLE_WISHLIST': {
             const product = action.payload;
             const exists = state.wishlist.some(item => item.id === product.id);
@@ -92,7 +96,7 @@ const shopReducer = (state, action) => {
         case 'SET_USER':
             return { ...state, user: action.payload, isAuthOpen: action.payload ? false : state.isAuthOpen };
         case 'LOGOUT':
-            return { ...state, user: null };
+            return { ...state, user: null, wishlist: [], cart: [] };
 
         // UI Actions
         case 'SET_CART_OPEN': return { ...state, isCartOpen: action.payload };
@@ -130,50 +134,130 @@ function extractUser(supabaseUser) {
     };
 }
 
+// ─── Cart localStorage helpers (user-specific keys) ───
+function getCartKey(userId) {
+    return userId ? `cart_${userId}` : 'guest_cart';
+}
+
+function loadCartFromStorage(userId) {
+    try {
+        const key = getCartKey(userId);
+        const raw = localStorage.getItem(key);
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            return Array.isArray(parsed) ? parsed : [];
+        }
+    } catch (e) {
+        console.error('Failed to load cart from localStorage', e);
+    }
+    return [];
+}
+
+function saveCartToStorage(userId, cart) {
+    try {
+        const key = getCartKey(userId);
+        localStorage.setItem(key, JSON.stringify(cart));
+    } catch (e) {
+        console.error('Failed to save cart to localStorage', e);
+    }
+}
+
 export const ShopProvider = ({ children }) => {
     const [state, dispatch] = useReducer(shopReducer, initialState);
     const [authLoading, setAuthLoading] = useState(true);
+    const [wishlistLoading, setWishlistLoading] = useState(false);
+    const initializedRef = useRef(false);
+    const currentUserIdRef = useRef(null);
+
+    // ─── Wishlist: Supabase helpers ───
+    const fetchWishlistFromSupabase = useCallback(async (userId) => {
+        if (!userId) {
+            dispatch({ type: 'SET_WISHLIST', payload: [] });
+            return;
+        }
+        setWishlistLoading(true);
+        try {
+            const { data, error } = await supabase
+                .from('wishlists')
+                .select('*, products(*)')
+                .eq('user_id', userId);
+
+            if (error) {
+                console.error('Wishlist fetch error:', error.message);
+                dispatch({ type: 'SET_WISHLIST', payload: [] });
+                return;
+            }
+
+            // Map to product objects that match the existing wishlist shape
+            const wishlistProducts = (data || [])
+                .filter(row => row.products) // skip if product was deleted
+                .map(row => ({
+                    ...row.products,
+                    image: row.products.images?.[0] || row.products.image || '',
+                    _wishlistRowId: row.id, // keep Supabase row id for deletion
+                }));
+
+            dispatch({ type: 'SET_WISHLIST', payload: wishlistProducts });
+        } catch (err) {
+            console.error('Wishlist fetch exception:', err);
+        } finally {
+            setWishlistLoading(false);
+        }
+    }, []);
+
+    // ─── Handle user change: load user-specific cart + wishlist ───
+    const handleUserChange = useCallback(async (user) => {
+        const userId = user?.id || null;
+
+        // Avoid reprocessing the same user
+        if (currentUserIdRef.current === userId && initializedRef.current) return;
+        currentUserIdRef.current = userId;
+
+        // Set user in state
+        dispatch({ type: 'SET_USER', payload: user });
+
+        // Load cart for this user (or guest)
+        const cart = loadCartFromStorage(userId);
+        dispatch({ type: 'SET_CART', payload: cart });
+
+        // Load wishlist from Supabase (only for logged-in users)
+        if (userId) {
+            await fetchWishlistFromSupabase(userId);
+        } else {
+            dispatch({ type: 'SET_WISHLIST', payload: [] });
+        }
+    }, [fetchWishlistFromSupabase]);
 
     // ─── Supabase Auth Listener ───
     useEffect(() => {
         // 1. Check existing session on mount
         supabase.auth.getSession().then(({ data: { session } }) => {
-            dispatch({ type: 'SET_USER', payload: extractUser(session?.user ?? null) });
-            setAuthLoading(false);
+            const user = extractUser(session?.user ?? null);
+            handleUserChange(user).then(() => {
+                initializedRef.current = true;
+                setAuthLoading(false);
+            });
         });
 
         // 2. Listen for auth changes (login, logout, token refresh)
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             (_event, session) => {
-                dispatch({ type: 'SET_USER', payload: extractUser(session?.user ?? null) });
-                setAuthLoading(false);
+                const user = extractUser(session?.user ?? null);
+                handleUserChange(user).then(() => {
+                    setAuthLoading(false);
+                });
             }
         );
 
         return () => subscription.unsubscribe();
-    }, []);
+    }, [handleUserChange]);
 
-    // ─── Cart/Wishlist Persistence (localStorage — device-level, not account-level) ───
+    // ─── Cart Persistence (user-specific localStorage) ───
     useEffect(() => {
-        const localData = localStorage.getItem('samCharmzState');
-        if (localData) {
-            try {
-                const parsed = JSON.parse(localData);
-                // Only restore cart & wishlist, NOT user (user comes from Supabase)
-                dispatch({ type: 'INIT_STATE', payload: { cart: parsed.cart, wishlist: parsed.wishlist } });
-            } catch (e) {
-                console.error("Failed to parse local storage", e);
-            }
-        }
-    }, []);
-
-    useEffect(() => {
-        const dataToSave = {
-            cart: state.cart,
-            wishlist: state.wishlist,
-        };
-        localStorage.setItem('samCharmzState', JSON.stringify(dataToSave));
-    }, [state.cart, state.wishlist]);
+        // Don't save until initial load is done
+        if (!initializedRef.current) return;
+        saveCartToStorage(currentUserIdRef.current, state.cart);
+    }, [state.cart]);
 
     // Cleanup Listener
     useEffect(() => {
@@ -184,27 +268,91 @@ export const ShopProvider = ({ children }) => {
         return () => window.removeEventListener('productDeleted', handleProductDeleted);
     }, []);
 
-    // Actions
+    // ─── Actions ───
     const addToCart = (product, quantity = 1) => dispatch({ type: 'ADD_TO_CART', payload: { ...product, quantity } });
     const removeFromCart = (id) => dispatch({ type: 'REMOVE_FROM_CART', payload: id });
     const updateQuantity = (id, change) => dispatch({ type: 'UPDATE_CART_QTY', payload: { id, change } });
+    const clearCart = () => dispatch({ type: 'CLEAR_CART' });
 
-    // Toggle needs full product for adding, but checking existence only needs ID.
-    // We will assume 'product' is passed.
-    const toggleWishlist = (product) => dispatch({ type: 'TOGGLE_WISHLIST', payload: product });
-    const moveToCart = (product) => dispatch({ type: 'MOVE_TO_CART', payload: product });
+    // Toggle wishlist — backed by Supabase for logged-in users
+    const toggleWishlist = async (product) => {
+        if (!state.user) {
+            // Not logged in — prompt login
+            dispatch({ type: 'SET_AUTH_OPEN', payload: true });
+            return;
+        }
+
+        const exists = state.wishlist.some(item => item.id === product.id);
+
+        if (exists) {
+            // Remove from Supabase
+            const { error } = await supabase
+                .from('wishlists')
+                .delete()
+                .eq('user_id', state.user.id)
+                .eq('product_id', product.id);
+
+            if (error) {
+                console.error('Wishlist remove error:', error.message);
+                return;
+            }
+            dispatch({ type: 'TOGGLE_WISHLIST', payload: product });
+        } else {
+            // Add to Supabase
+            const { error } = await supabase
+                .from('wishlists')
+                .insert([{ user_id: state.user.id, product_id: product.id }]);
+
+            if (error) {
+                console.error('Wishlist add error:', error.message);
+                return;
+            }
+            dispatch({ type: 'TOGGLE_WISHLIST', payload: product });
+        }
+    };
+
+    const moveToCart = async (product) => {
+        if (!state.user) {
+            dispatch({ type: 'SET_AUTH_OPEN', payload: true });
+            return;
+        }
+
+        // Remove from Supabase wishlist
+        await supabase
+            .from('wishlists')
+            .delete()
+            .eq('user_id', state.user.id)
+            .eq('product_id', product.id);
+
+        dispatch({ type: 'MOVE_TO_CART', payload: product });
+    };
 
     // Auth is handled by Supabase — these are convenience wrappers
     const login = (userData) => dispatch({ type: 'SET_USER', payload: userData });
     const logout = async () => {
+        const userId = currentUserIdRef.current;
+        // Save current cart before clearing
+        if (userId) {
+            saveCartToStorage(userId, state.cart);
+        }
         await supabase.auth.signOut();
+        currentUserIdRef.current = null;
         dispatch({ type: 'LOGOUT' });
+        // Load guest cart
+        const guestCart = loadCartFromStorage(null);
+        dispatch({ type: 'SET_CART', payload: guestCart });
     };
 
     const openCart = () => dispatch({ type: 'SET_CART_OPEN', payload: true });
     const closeCart = () => dispatch({ type: 'SET_CART_OPEN', payload: false });
 
-    const openWishlist = () => dispatch({ type: 'SET_WISHLIST_OPEN', payload: true });
+    const openWishlist = () => {
+        if (!state.user) {
+            dispatch({ type: 'SET_AUTH_OPEN', payload: true });
+            return;
+        }
+        dispatch({ type: 'SET_WISHLIST_OPEN', payload: true });
+    };
     const closeWishlist = () => dispatch({ type: 'SET_WISHLIST_OPEN', payload: false });
 
     const openAuth = () => dispatch({ type: 'SET_AUTH_OPEN', payload: true });
@@ -213,9 +361,11 @@ export const ShopProvider = ({ children }) => {
     const value = {
         ...state,
         authLoading,
+        wishlistLoading,
         addToCart,
         removeFromCart,
         updateQuantity,
+        clearCart,
         toggleWishlist,
         moveToCart,
         login,

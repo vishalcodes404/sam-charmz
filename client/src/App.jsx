@@ -8,7 +8,6 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import WishlistDrawer from './components/WishlistDrawer';
 import CartDrawer from './components/CartDrawer';
-import CheckoutModal from './components/CheckoutModal';
 import PolicyModal from './components/PolicyModal';
 import AuthModal from './components/AuthModal';
 
@@ -36,7 +35,6 @@ function App() {
     const [searchTerm, setSearchTerm] = useState("");
     const [policyTab, setPolicyTab] = useState('about');
     const [isPolicyOpen, setIsPolicyOpen] = useState(false);
-    const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
     // Scroll to top instantly on any structural route change or search param change
     useEffect(() => {
@@ -158,10 +156,6 @@ function App() {
                 defaultTab={policyTab}
             />
 
-            <CheckoutModal
-                isOpen={isCheckoutOpen}
-                onClose={() => setIsCheckoutOpen(false)}
-            />
 
         </div>
     );

@@ -47,7 +47,7 @@ const AuthModal = () => {
 
             } else if (view === 'signup') {
                 // ─── Sign Up ───
-                const { error } = await supabase.auth.signUp({
+                const { data: signUpData, error } = await supabase.auth.signUp({
                     email: formData.email,
                     password: formData.password,
                     options: {
@@ -59,6 +59,14 @@ const AuthModal = () => {
                     },
                 });
                 if (error) throw error;
+
+                // Supabase returns a fake user with no identities if email already exists
+                if (signUpData?.user && signUpData.user.identities?.length === 0) {
+                    setErrorMsg('Account already exists. Please login instead.');
+                    setIsLoading(false);
+                    return;
+                }
+
                 setSuccessMsg('Account created! Check your email to confirm, then sign in.');
                 setTimeout(() => {
                     setSuccessMsg('');

@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShoppingBag, Trash2, Plus, Minus } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import { ShinyButton } from './ui/ShinyButton';
+import CheckoutModal from './CheckoutModal';
 
 const CartDrawer = () => {
     const {
         isCartOpen, closeCart,
         cart, removeFromCart, updateQuantity
     } = useShop();
+    const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
     const totalPrice = cart.reduce((total, item) => {
         const priceString = String(item.price || '0');
@@ -17,6 +19,8 @@ const CartDrawer = () => {
     }, 0);
 
     return (
+        <>
+        <CheckoutModal isOpen={isCheckoutOpen} onClose={() => setIsCheckoutOpen(false)} />
         <AnimatePresence>
             {isCartOpen && (
                 <>
@@ -117,7 +121,7 @@ const CartDrawer = () => {
                                     <span className="font-serif text-xl text-brand-primary font-bold">₹{totalPrice.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
                                 </div>
                                 <ShinyButton
-                                    onClick={() => alert("Checkout not implemented yet")}
+                                    onClick={() => { closeCart(); setIsCheckoutOpen(true); }}
                                     className="w-full !py-4 !text-sm !font-bold !uppercase !tracking-widest shadow-lg shadow-brand-primary/20"
                                 >
                                     Checkout
@@ -128,6 +132,7 @@ const CartDrawer = () => {
                 </>
             )}
         </AnimatePresence>
+        </>
     );
 };
 

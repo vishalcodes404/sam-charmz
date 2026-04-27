@@ -1,24 +1,94 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ShoppingBag, Package, Calendar, Clock, ChevronRight } from 'lucide-react';
+import { ShoppingBag, Package, Calendar, Clock, ChevronRight, LogIn } from 'lucide-react';
 import { ShinyButton } from '../components/ui/ShinyButton';
 import { useNavigate } from 'react-router-dom';
+import { useShop } from '../context/ShopContext';
+import { supabase } from '../lib/supabaseClient';
 
 const OrdersPage = () => {
     const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const { user, openAuth } = useShop();
 
     useEffect(() => {
-        // Fetch orders saved to local storage (simulated backend)
-        const savedOrders = JSON.parse(localStorage.getItem('samcharmz_orders') || '[]');
-        // Sort by newest first
-        setOrders(savedOrders.sort((a, b) => new Date(b.date) - new Date(a.date)));
-    }, []);
+        const fetchOrders = async () => {
+            if (!user) {
+                setOrders([]);
+                setLoading(false);
+                return;
+            }
+
+            setLoading(true);
+            const { data, error } = await supabase
+                .from('orders')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Orders fetch error:', error.message);
+                setOrders([]);
+            } else {
+                setOrders(data || []);
+            }
+            setLoading(false);
+        };
+
+        fetchOrders();
+    }, [user]);
 
     const formatDate = (dateString) => {
         const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
         return new Date(dateString).toLocaleDateString('en-US', options);
     };
+
+    // Not logged in view
+    if (!user) {
+        return (
+            <div className="pt-24 pb-20 px-4 md:px-8 min-h-screen">
+                <div className="container mx-auto max-w-4xl pt-8">
+                    <div className="text-center mb-12">
+                        <motion.h1
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="font-serif text-3xl md:text-5xl mb-4 text-brand-light italic"
+                        >
+                            Your Orders
+                        </motion.h1>
+                        <div className="w-16 h-[1px] bg-brand-primary mx-auto"></div>
+                    </div>
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="text-center py-20 bg-brand-surface border border-brand-light/10 rounded-2xl shadow-xl backdrop-blur-sm"
+                    >
+                        <LogIn className="w-16 h-16 text-brand-light/20 mx-auto mb-4" />
+                        <h2 className="font-serif text-2xl text-brand-light mb-2">Please Sign In</h2>
+                        <p className="text-brand-gray mb-8">Sign in to view your order history.</p>
+                        <ShinyButton onClick={openAuth} className="!px-8 !py-3 mx-auto">
+                            Sign In
+                        </ShinyButton>
+                    </motion.div>
+                </div>
+            </div>
+        );
+    }
+
+    if (loading) {
+        return (
+            <div className="pt-24 pb-20 px-4 md:px-8 min-h-screen">
+                <div className="container mx-auto max-w-4xl pt-8 text-center">
+                    <div className="text-center mb-12">
+                        <h1 className="font-serif text-3xl md:text-5xl mb-4 text-brand-light italic">Your Orders</h1>
+                        <div className="w-16 h-[1px] bg-brand-primary mx-auto"></div>
+                    </div>
+                    <div className="py-20 text-brand-gray">Loading your orders...</div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="pt-24 pb-20 px-4 md:px-8 min-h-screen">
@@ -72,7 +142,7 @@ const OrdersPage = () => {
                                         <div className="flex flex-wrap items-center gap-4 text-sm text-brand-gray mt-2">
                                             <div className="flex items-center gap-1">
                                                 <Calendar className="w-4 h-4" />
-                                                <span>{formatDate(order.date)}</span>
+                                                <span>{formatDate(order.created_at || order.date)}</span>
                                             </div>
                                             <div className="flex items-center gap-1">
                                                 <Package className="w-4 h-4" />
@@ -82,7 +152,7 @@ const OrdersPage = () => {
                                     </div>
                                     <div className="text-left md:text-right">
                                         <p className="text-xs text-brand-gray uppercase tracking-widest mb-1">Total Amount</p>
-                                        <p className="font-serif text-2xl text-brand-light">₹{order.total.toLocaleString()}</p>
+                                        <p className="font-serif text-2xl text-brand-light">₹{(order.total || 0).toLocaleString()}</p>
                                     </div>
                                 </div>
 
@@ -112,7 +182,7 @@ const OrdersPage = () => {
                                 {/* Order Footer */}
                                 <div className="mt-6 pt-6 border-t border-brand-light/10 flex flex-col md:flex-row justify-between items-center gap-4">
                                     <div className="text-sm text-brand-gray">
-                                        <span className="font-medium text-brand-light">Shipping to:</span> {order.customerName || 'Guest'}, {order.email || 'No email provided'}
+                                        <span className="font-medium text-brand-light">Shipping to:</span> {order.customer_name || 'Guest'}, {order.email || 'No email provided'}
                                     </div>
                                 </div>
                             </motion.div>

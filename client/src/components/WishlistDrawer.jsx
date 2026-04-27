@@ -61,7 +61,7 @@ const WishlistDrawer = () => {
                                         <div key={item.id} className="flex gap-4 p-3 hover:bg-brand-light/5 rounded-xl transition-colors group border border-transparent hover:border-brand-light/10">
                                             <div className="w-24 h-24 flex-shrink-0 bg-brand-light/5 rounded-lg overflow-hidden">
                                                 <img
-                                                    src={item.image}
+                                                    src={item.images?.[0] || item.image}
                                                     alt={item.name}
                                                     className="w-full h-full object-cover"
                                                 />
@@ -69,7 +69,7 @@ const WishlistDrawer = () => {
                                             <div className="flex-1 flex flex-col justify-between">
                                                 <div>
                                                     <h3 className="font-serif text-lg leading-tight mb-1 text-brand-light">{item.name}</h3>
-                                                    <p className="font-sans text-sm text-brand-primary">{item.price}</p>
+                                                    <p className="font-sans text-sm text-brand-primary">{typeof item.price === 'number' ? `₹${item.price.toFixed(2)}` : item.price}</p>
                                                 </div>
 
                                                 <div className="flex gap-3 mt-4">
