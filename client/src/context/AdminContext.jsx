@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
 const AdminContext = createContext(null);
@@ -11,6 +11,8 @@ export function AdminProvider({ children }) {
     // ─── Admin Auth (Supabase-based) ───
     const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
     const [adminChecking, setAdminChecking] = useState(true);
+    const adminCheckingRef = useRef(false);
+    const loginInProgressRef = useRef(false);
 
     // ─── Data State ───
     const [products, setProducts] = useState([]);
@@ -25,21 +27,29 @@ export function AdminProvider({ children }) {
     // ─── Check admin status on mount ───
     useEffect(() => {
         const checkAdmin = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session?.user) {
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('is_admin')
-                    .eq('id', session.user.id)
-                    .single();
-                setIsAdminLoggedIn(profile?.is_admin === true);
+            // Prevent duplicate checkAdmin calls
+            if (adminCheckingRef.current) return;
+            adminCheckingRef.current = true;
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session?.user) {
+                    const { data: profile } = await supabase
+                        .from('profiles')
+                        .select('is_admin')
+                        .eq('id', session.user.id)
+                        .single();
+                    setIsAdminLoggedIn(profile?.is_admin === true);
+                }
+            } finally {
+                setAdminChecking(false);
             }
-            setAdminChecking(false);
         };
         checkAdmin();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             async (_event, session) => {
+                // Skip if adminLogin is actively running — it handles state itself
+                if (loginInProgressRef.current) return;
                 if (session?.user) {
                     const { data: profile } = await supabase
                         .from('profiles')
@@ -95,6 +105,9 @@ export function AdminProvider({ children }) {
 
     // ─── Admin Auth ───
     const adminLogin = async (email, password) => {
+        // Prevent duplicate concurrent login calls
+        if (loginInProgressRef.current) return { success: false, error: 'Login already in progress.' };
+        loginInProgressRef.current = true;
         try {
             const { data, error: authErr } = await supabase.auth.signInWithPassword({ email, password });
             if (authErr) return { success: false, error: authErr.message };
@@ -115,6 +128,8 @@ export function AdminProvider({ children }) {
             return { success: true };
         } catch (err) {
             return { success: false, error: err.message || 'Login failed.' };
+        } finally {
+            loginInProgressRef.current = false;
         }
     };
 

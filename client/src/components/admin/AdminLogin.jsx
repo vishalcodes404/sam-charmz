@@ -11,11 +11,15 @@ export default function AdminLogin() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (loading) return; // Prevent double-submit
         setError('');
         setLoading(true);
-        const result = await adminLogin(email, password);
-        if (!result.success) setError(result.error);
-        setLoading(false);
+        try {
+            const result = await adminLogin(email, password);
+            if (!result.success) setError(result.error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
