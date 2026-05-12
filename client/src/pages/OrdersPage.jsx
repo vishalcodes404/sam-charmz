@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ShoppingBag, Package, Calendar, Clock, ChevronRight, LogIn, XCircle, RotateCcw } from 'lucide-react';
+import { ShoppingBag, Package, Calendar, Clock, ChevronRight, LogIn, XCircle } from 'lucide-react';
 import { ShinyButton } from '../components/ui/ShinyButton';
 import { useNavigate } from 'react-router-dom';
 import { useShop } from '../context/ShopContext';
@@ -76,32 +76,7 @@ const OrdersPage = () => {
         }
     };
 
-    // Return order — only allowed for Delivered
-    const handleReturn = async (order) => {
-        if (!window.confirm('Are you sure you want to request a return for this order?')) return;
-        setActionLoading(order.id);
-        try {
-            const updates = { status: 'Return Requested' };
-            updates.return_requested_at = new Date().toISOString();
-
-            const { error } = await supabase
-                .from('orders')
-                .update(updates)
-                .eq('id', order.id);
-
-            if (error) throw error;
-            setOrders(prev => prev.map(o => o.id === order.id ? { ...o, ...updates } : o));
-            showToast('success', 'Return request submitted.');
-        } catch (err) {
-            console.error('Return order error:', err);
-            showToast('error', err.message || 'Failed to request return.');
-        } finally {
-            setActionLoading(null);
-        }
-    };
-
     const canCancel = (status) => ['Pending', 'Confirmed'].includes(status);
-    const canReturn = (status) => status === 'Delivered';
 
     const getStatusColor = (status) => {
         const map = {
@@ -111,8 +86,6 @@ const OrdersPage = () => {
             Shipped: 'bg-purple-500/10 text-purple-400 border border-purple-500/20',
             Delivered: 'bg-green-500/10 text-green-500 border border-green-500/20',
             Cancelled: 'bg-red-500/10 text-red-400 border border-red-500/20',
-            'Return Requested': 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20',
-            Returned: 'bg-gray-500/10 text-gray-400 border border-gray-500/20',
         };
         return map[status] || 'bg-brand-primary/10 text-brand-primary border border-brand-primary/20';
     };
@@ -266,7 +239,7 @@ const OrdersPage = () => {
                                         </div>
                                     </div>
 
-                                    {/* Order Footer with Cancel/Return */}
+                                    {/* Order Footer */}
                                     <div className="mt-6 pt-6 border-t border-brand-light/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                                         <div className="text-sm text-brand-gray">
                                             <span className="font-medium text-brand-light">Shipping to:</span> {order.customer_name || 'Guest'}, {order.email || 'No email provided'}
@@ -284,20 +257,6 @@ const OrdersPage = () => {
                                                         <XCircle className="w-4 h-4" />
                                                     )}
                                                     Cancel Order
-                                                </button>
-                                            )}
-                                            {canReturn(status) && (
-                                                <button
-                                                    onClick={() => handleReturn(order)}
-                                                    disabled={isActing}
-                                                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-yellow-400 border border-yellow-500/30 rounded-xl hover:bg-yellow-500/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                                >
-                                                    {isActing ? (
-                                                        <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-                                                    ) : (
-                                                        <RotateCcw className="w-4 h-4" />
-                                                    )}
-                                                    Request Return
                                                 </button>
                                             )}
                                         </div>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAdmin } from '../../context/AdminContext';
 
-const STATUS_OPTIONS = ['Pending', 'Confirmed', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Return Requested', 'Returned'];
+const STATUS_OPTIONS = ['Pending', 'Confirmed', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
 
 const STATUS_COLORS = {
     Pending: 'bg-orange-500/15 text-orange-400 border-orange-500/30',
@@ -10,9 +10,7 @@ const STATUS_COLORS = {
     Shipped: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
     Delivered: 'bg-brand-secondary/15 text-brand-secondary border-brand-secondary/30',
     Cancelled: 'bg-red-500/15 text-red-400 border-red-500/30',
-    'Return Requested': 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30',
-    Returned: 'bg-gray-500/15 text-gray-400 border-gray-500/30',
-};
+}
 
 export default function AdminOrders() {
     const { orders, updateOrderStatus, deleteOrder, refreshOrders } = useAdmin();
