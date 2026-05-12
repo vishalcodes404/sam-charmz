@@ -1,9 +1,27 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Lock, CheckCircle, CreditCard, Loader2, LogIn } from 'lucide-react';
+import { X, Lock, CheckCircle, CreditCard, Loader2, LogIn, Banknote, Zap } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import { ShinyButton } from './ui/ShinyButton';
 import { supabase } from '../lib/supabaseClient';
+
+const PAYMENT_METHODS = [
+    {
+        id: 'net_banking',
+        label: 'Net Banking',
+        icon: <Banknote className="w-5 h-5" />,
+        description: 'Pay securely via your bank',
+        available: true,
+    },
+    {
+        id: 'razorpay_demo',
+        label: 'Razorpay (Demo)',
+        icon: <Zap className="w-5 h-5" />,
+        description: 'Online payment — coming soon',
+        available: true,
+        isDemo: true,
+    },
+];
 
 const CheckoutModal = ({ isOpen, onClose }) => {
     const { cart, user, openAuth, clearCart } = useShop();
@@ -15,6 +33,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
     const [step, setStep] = useState('details'); // details, processing, success, login
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState('net_banking');
 
     const [formData, setFormData] = useState({ name: '', email: '', address: '', city: '', postcode: '' });
 
@@ -43,6 +62,9 @@ const CheckoutModal = ({ isOpen, onClose }) => {
         setErrorMsg('');
 
         try {
+            const selectedMethod = PAYMENT_METHODS.find(m => m.id === paymentMethod);
+            const isDemo = selectedMethod?.isDemo;
+
             const order = {
                 user_id: user.id,
                 customer_name: formData.name,
@@ -58,6 +80,8 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                 })),
                 total,
                 status: 'Pending',
+                payment_method: selectedMethod?.label || 'Net Banking',
+                payment_status: isDemo ? 'Demo Pending' : 'Pending',
             };
 
             const { error } = await supabase
@@ -164,12 +188,41 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                                         </div>
 
                                         <div className="space-y-4">
-                                            <h3 className="font-sans font-bold text-sm uppercase tracking-widest border-b border-brand-light/10 pb-2 text-brand-light">Payment Details</h3>
-                                            <div className="border border-brand-light/10 p-4 rounded bg-brand-light/5 flex items-center gap-3">
-                                                <CreditCard className="w-5 h-5 text-brand-gray" />
-                                                <span className="text-sm text-brand-gray">Cash on Delivery (COD)</span>
+                                            <h3 className="font-sans font-bold text-sm uppercase tracking-widest border-b border-brand-light/10 pb-2 text-brand-light">Payment Method</h3>
+                                            <div className="space-y-3">
+                                                {PAYMENT_METHODS.map(method => (
+                                                    <label
+                                                        key={method.id}
+                                                        className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${
+                                                            paymentMethod === method.id
+                                                                ? 'border-brand-primary/50 bg-brand-primary/5'
+                                                                : 'border-brand-light/10 hover:border-brand-light/20 bg-brand-light/5'
+                                                        }`}
+                                                    >
+                                                        <input
+                                                            type="radio"
+                                                            name="paymentMethod"
+                                                            value={method.id}
+                                                            checked={paymentMethod === method.id}
+                                                            onChange={() => setPaymentMethod(method.id)}
+                                                            className="accent-[#D4AF37] w-4 h-4"
+                                                        />
+                                                        <div className="text-brand-gray">{method.icon}</div>
+                                                        <div className="flex-1">
+                                                            <p className="text-sm font-medium text-brand-light">{method.label}</p>
+                                                            <p className="text-xs text-brand-gray">{method.description}</p>
+                                                        </div>
+                                                        {method.isDemo && (
+                                                            <span className="text-[10px] uppercase tracking-wider bg-yellow-500/15 text-yellow-400 border border-yellow-500/30 px-2 py-0.5 rounded-full font-medium">Demo</span>
+                                                        )}
+                                                    </label>
+                                                ))}
                                             </div>
-                                            <p className="text-xs text-brand-gray mt-2">Payment will be collected at the time of delivery.</p>
+                                            {paymentMethod === 'razorpay_demo' && (
+                                                <p className="text-xs text-yellow-400/70 bg-yellow-500/5 border border-yellow-500/10 rounded-lg px-3 py-2">
+                                                    ⚡ Razorpay integration coming soon. Your order will be placed as a demo order.
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
 

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { getReviewsByProduct, addReview } from '../lib/reviews';
+import { getReviewsByProduct, addReview, deleteReview } from '../lib/reviews';
+import { useShop } from '../context/ShopContext';
+import { Trash2 } from 'lucide-react';
 
 // Star display component
 function Stars({ rating, size = 'w-4 h-4', interactive = false, onRate }) {
@@ -30,10 +32,20 @@ export default function ProductReviews({ productId }) {
     const [reviews, setReviews] = useState([]);
     const [form, setForm] = useState({ name: '', rating: 0, comment: '' });
     const [errors, setErrors] = useState({});
-    const [toast, setToast] = useState(null); // { type: 'success'|'error', message }
+    const [toast, setToast] = useState(null);
+    const [submitting, setSubmitting] = useState(false);
+    const [deletingId, setDeletingId] = useState(null);
+    const { user } = useShop();
 
+    // Load reviews (async)
     useEffect(() => {
-        setReviews(getReviewsByProduct(productId));
+        let mounted = true;
+        const load = async () => {
+            const data = await getReviewsByProduct(productId);
+            if (mounted) setReviews(data);
+        };
+        load();
+        return () => { mounted = false; };
     }, [productId]);
 
     const showToast = (type, message) => {
@@ -50,21 +62,44 @@ export default function ProductReviews({ productId }) {
         return Object.keys(e).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validate()) {
             showToast('error', 'Please fix the errors above');
             return;
         }
+        setSubmitting(true);
         try {
-            addReview(productId, form);
-            setReviews(getReviewsByProduct(productId));
+            const newReview = await addReview(productId, form, user?.id || null);
+            setReviews(prev => [newReview, ...prev]);
             setForm({ name: '', rating: 0, comment: '' });
             setErrors({});
             showToast('success', 'Review submitted successfully!');
         } catch {
             showToast('error', 'Failed to submit review');
+        } finally {
+            setSubmitting(false);
         }
+    };
+
+    const handleDelete = async (reviewId) => {
+        if (!window.confirm('Are you sure you want to delete this review?')) return;
+        setDeletingId(reviewId);
+        try {
+            await deleteReview(reviewId);
+            setReviews(prev => prev.filter(r => r.id !== reviewId));
+            showToast('success', 'Review deleted.');
+        } catch {
+            showToast('error', 'Failed to delete review.');
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
+    // Check if current user can delete a review
+    const canDelete = (review) => {
+        if (!user) return false;
+        return review.user_id === user.id;
     };
 
     // Compute average
@@ -151,9 +186,10 @@ export default function ProductReviews({ productId }) {
                 </div>
                 <button
                     type="submit"
-                    className="px-6 py-2.5 bg-brand-primary text-brand-dark font-bold rounded-xl hover:opacity-90 active:scale-[0.98] transition-all text-sm"
+                    disabled={submitting}
+                    className="px-6 py-2.5 bg-brand-primary text-brand-dark font-bold rounded-xl hover:opacity-90 active:scale-[0.98] transition-all text-sm disabled:opacity-50"
                 >
-                    Submit Review
+                    {submitting ? 'Submitting...' : 'Submit Review'}
                 </button>
             </form>
 
@@ -167,14 +203,26 @@ export default function ProductReviews({ productId }) {
                             <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-3">
                                     <div className="w-8 h-8 rounded-full bg-brand-primary/20 flex items-center justify-center text-brand-primary font-bold text-sm">
-                                        {review.name.charAt(0).toUpperCase()}
+                                        {(review.name || '?').charAt(0).toUpperCase()}
                                     </div>
                                     <div>
                                         <p className="text-brand-light font-medium text-sm">{review.name}</p>
                                         <p className="text-brand-gray text-xs">{formatDate(review.createdAt)}</p>
                                     </div>
                                 </div>
-                                <Stars rating={review.rating} size="w-3.5 h-3.5" />
+                                <div className="flex items-center gap-3">
+                                    <Stars rating={review.rating} size="w-3.5 h-3.5" />
+                                    {canDelete(review) && (
+                                        <button
+                                            onClick={() => handleDelete(review.id)}
+                                            disabled={deletingId === review.id}
+                                            className="p-1.5 rounded-lg text-brand-gray hover:text-red-400 hover:bg-red-500/10 transition-all disabled:opacity-50"
+                                            title="Delete your review"
+                                        >
+                                            <Trash2 className="w-3.5 h-3.5" />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                             <p className="text-brand-gray text-sm leading-relaxed ml-11">{review.comment}</p>
                         </div>

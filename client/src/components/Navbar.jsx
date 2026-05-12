@@ -88,7 +88,6 @@ const Navbar = ({ onSearch, searchTerm, onLogoClick, onShopClick }) => {
                         <NavLink onClick={onLogoClick} text="Home" />
                         <NavLink onClick={onShopClick} text="Collections" />
                         <NavLink onClick={() => { onLogoClick(); navigate('/orders'); }} text="Order Details" />
-                        <NavLink onClick={handleOurStoryClick} text="Our Story" />
                     </div>
 
                     {/* Right Icons & Actions */}
@@ -166,7 +165,6 @@ const Navbar = ({ onSearch, searchTerm, onLogoClick, onShopClick }) => {
                             <MobileNavLink onClick={() => { setIsMobileMenuOpen(false); onShopClick(); }} text="Collections" delay={0.2} />
                             <MobileNavLink onClick={() => { setIsMobileMenuOpen(false); openWishlist(); }} text="Wishlist" delay={0.25} />
                             <MobileNavLink onClick={() => { setIsMobileMenuOpen(false); navigate('/orders'); }} text="Order Details" delay={0.3} />
-                            <MobileNavLink onClick={(e) => { setIsMobileMenuOpen(false); handleOurStoryClick(e); }} text="Our Story" delay={0.4} />
 
                             <motion.button
                                 initial={{ opacity: 0, y: 20 }}

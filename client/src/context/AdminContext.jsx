@@ -195,7 +195,6 @@ export function AdminProvider({ children }) {
         setIsAdminLoggedIn(false);
     };
 
-    // ─── Product CRUD ───
     const addProduct = async (product) => {
         const newProduct = {
             name: product.name,
@@ -203,6 +202,7 @@ export function AdminProvider({ children }) {
             category: product.category,
             description: product.description || '',
             images: product.images || [],
+            stock: parseInt(product.stock) || 0,
         };
         const { data, error: err } = await supabase
             .from('products')
@@ -221,6 +221,7 @@ export function AdminProvider({ children }) {
             category: updatedData.category,
             description: updatedData.description || '',
             images: updatedData.images || [],
+            stock: parseInt(updatedData.stock) || 0,
         };
         const { data, error: err } = await supabase
             .from('products')
@@ -320,8 +321,19 @@ export function AdminProvider({ children }) {
             .from('orders')
             .update({ status })
             .eq('id', orderId);
-        if (err) { setError(err.message); return; }
+        if (err) { setError(err.message); return { success: false, error: err.message }; }
         setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
+        return { success: true };
+    };
+
+    const deleteOrder = async (orderId) => {
+        const { error: err } = await supabase
+            .from('orders')
+            .delete()
+            .eq('id', orderId);
+        if (err) { setError(err.message); return { success: false, error: err.message }; }
+        setOrders(prev => prev.filter(o => o.id !== orderId));
+        return { success: true };
     };
 
     const refreshOrders = async () => {
@@ -347,6 +359,7 @@ export function AdminProvider({ children }) {
             editCategory,
             deleteCategory,
             updateOrderStatus,
+            deleteOrder,
             refreshOrders,
         }}>
             {children}

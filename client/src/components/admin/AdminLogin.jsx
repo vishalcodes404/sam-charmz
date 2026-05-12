@@ -62,7 +62,7 @@ export default function AdminLogin() {
                                 type="email"
                                 value={email}
                                 onChange={e => setEmail(e.target.value)}
-                                placeholder="admin@samcharmz.com"
+                                placeholder="Enter your email"
                                 required
                                 className="w-full bg-brand-dark border border-white/10 rounded-xl px-4 py-3 text-brand-light placeholder-brand-gray/50 focus:outline-none focus:border-brand-primary/60 focus:ring-1 focus:ring-brand-primary/30 transition-all"
                             />

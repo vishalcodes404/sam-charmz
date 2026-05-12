@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useAdmin } from '../../context/AdminContext';
 
-const EMPTY_FORM = { name: '', price: '', category: '', description: '', images: [] };
+const EMPTY_FORM = { name: '', price: '', category: '', description: '', images: [], stock: '' };
 const MAX_IMAGES = 3;
 
 function ProductModal({ isOpen, onClose, onSave, initial, categoryNames }) {
@@ -165,6 +165,17 @@ function ProductModal({ isOpen, onClose, onSave, initial, categoryNames }) {
                             placeholder="Describe this product..."
                             rows={3}
                             className="w-full bg-brand-dark border border-white/10 rounded-xl px-4 py-2.5 text-brand-light placeholder-brand-gray/40 focus:outline-none focus:border-brand-primary/50 transition-all text-sm resize-none"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm text-brand-gray mb-1">Stock Quantity</label>
+                        <input
+                            type="number"
+                            min="0"
+                            value={form.stock}
+                            onChange={e => setForm(p => ({ ...p, stock: e.target.value }))}
+                            placeholder="e.g. 25"
+                            className="w-full bg-brand-dark border border-white/10 rounded-xl px-4 py-2.5 text-brand-light placeholder-brand-gray/40 focus:outline-none focus:border-brand-primary/50 transition-all text-sm"
                         />
                     </div>
 
@@ -354,12 +365,13 @@ export default function AdminProducts() {
                                 <th className="px-4 py-3 text-left">Product</th>
                                 <th className="px-4 py-3 text-left">Category</th>
                                 <th className="px-4 py-3 text-right">Price</th>
+                                <th className="px-4 py-3 text-right">Stock</th>
                                 <th className="px-4 py-3 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-white/5">
                             {filtered.length === 0 ? (
-                                <tr><td colSpan={4} className="px-4 py-12 text-center text-brand-gray">No products found.</td></tr>
+                                <tr><td colSpan={5} className="px-4 py-12 text-center text-brand-gray">No products found.</td></tr>
                             ) : filtered.map(p => (
                                 <tr key={p.id} className="hover:bg-white/[0.02] transition-colors group">
                                     <td className="px-4 py-3">
@@ -374,6 +386,11 @@ export default function AdminProducts() {
                                         </span>
                                     </td>
                                     <td className="px-4 py-3 text-right text-brand-primary font-semibold">₹{parseFloat(p.price).toFixed(2)}</td>
+                                    <td className="px-4 py-3 text-right">
+                                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${(parseInt(p.stock) || 0) > 0 ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+                                            {(parseInt(p.stock) || 0) > 0 ? p.stock : 'Out'}
+                                        </span>
+                                    </td>
                                     <td className="px-4 py-3 text-right">
                                         <div className="flex items-center justify-end gap-2">
                                             <button onClick={() => handleEdit(p)} className="p-2 rounded-lg text-brand-gray hover:text-brand-primary hover:bg-brand-primary/10 transition-all" title="Edit">

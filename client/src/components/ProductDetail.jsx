@@ -25,7 +25,12 @@ const ProductDetail = ({ product, onBack }) => {
 
     if (!product) return null;
 
+    // Stock logic
+    const stock = typeof product.stock === 'number' ? product.stock : parseInt(product.stock) || 0;
+    const isOutOfStock = stock <= 0;
+
     const handleAddToCart = () => {
+        if (isOutOfStock) return;
         addToCart(product, quantity);
     };
 
@@ -100,7 +105,22 @@ const ProductDetail = ({ product, onBack }) => {
                         >
                             <span className="text-sm text-brand-primary uppercase tracking-widest mb-2 block">{product.category}</span>
                             <h1 className="font-serif text-4xl lg:text-5xl italic mb-4 text-brand-light">{product.name}</h1>
-                            <p className="font-sans text-2xl mb-8 text-brand-light">{displayPrice}</p>
+                            <p className="font-sans text-2xl mb-4 text-brand-light">{displayPrice}</p>
+
+                            {/* Stock Display */}
+                            <div className="mb-6">
+                                {isOutOfStock ? (
+                                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 text-sm font-medium">
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+                                        Out of Stock
+                                    </span>
+                                ) : (
+                                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20 text-sm font-medium">
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                                        Stock available: {stock}
+                                    </span>
+                                )}
+                            </div>
 
                             {/* Description Section */}
                             <div className="mb-8">
@@ -122,13 +142,15 @@ const ProductDetail = ({ product, onBack }) => {
                                     <button
                                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
                                         className="px-3 h-full hover:bg-brand-light/10 text-brand-light"
+                                        disabled={isOutOfStock}
                                     >
                                         <Minus className="w-4 h-4" />
                                     </button>
                                     <span className="flex-1 text-center font-medium text-brand-light">{quantity}</span>
                                     <button
-                                        onClick={() => setQuantity(quantity + 1)}
+                                        onClick={() => setQuantity(Math.min(stock || 99, quantity + 1))}
                                         className="px-3 h-full hover:bg-brand-light/10 text-brand-light"
+                                        disabled={isOutOfStock}
                                     >
                                         <Plus className="w-4 h-4" />
                                     </button>
@@ -137,10 +159,12 @@ const ProductDetail = ({ product, onBack }) => {
                                 <div className="flex flex-1 gap-4">
                                     <ShinyButton
                                         onClick={handleAddToCart}
-                                        className="flex-1 w-full"
+                                        className={`flex-1 w-full ${isOutOfStock ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        disabled={isOutOfStock}
                                     >
                                         <span className="flex items-center justify-center gap-2">
-                                            <ShoppingBag className="w-4 h-4" /> Add to Cart
+                                            <ShoppingBag className="w-4 h-4" />
+                                            {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
                                         </span>
                                     </ShinyButton>
                                     <motion.button
@@ -159,22 +183,6 @@ const ProductDetail = ({ product, onBack }) => {
                                             <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
                                         </motion.div>
                                     </motion.button>
-                                </div>
-                            </div>
-
-                            {/* Additional Info */}
-                            <div className="border-t border-brand-light/10 pt-8 space-y-4 font-sans text-sm text-brand-gray">
-                                <div className="flex gap-4">
-                                    <span className="font-medium text-brand-light w-24">Material:</span>
-                                    <span>Premium Alloy & Gold/Silver Plating</span>
-                                </div>
-                                <div className="flex gap-4">
-                                    <span className="font-medium text-brand-light w-24">Shipping:</span>
-                                    <span>Free shipping on orders over ₹999</span>
-                                </div>
-                                <div className="flex gap-4">
-                                    <span className="font-medium text-brand-light w-24">Returns:</span>
-                                    <span>7-day easy returns policy</span>
                                 </div>
                             </div>
                         </motion.div>
