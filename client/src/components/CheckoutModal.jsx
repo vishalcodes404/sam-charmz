@@ -10,17 +10,9 @@ const PAYMENT_METHODS = [
         id: 'net_banking',
         label: 'Net Banking',
         icon: <Banknote className="w-5 h-5" />,
-        description: 'Pay securely via your bank',
+        description: 'Pay via upi,banks,cards etc...',
         available: true,
-    },
-    {
-        id: 'razorpay_demo',
-        label: 'Razorpay (Demo)',
-        icon: <Zap className="w-5 h-5" />,
-        description: 'Online payment — coming soon',
-        available: true,
-        isDemo: true,
-    },
+    }
 ];
 
 const CheckoutModal = ({ isOpen, onClose }) => {
@@ -193,11 +185,10 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                                                 {PAYMENT_METHODS.map(method => (
                                                     <label
                                                         key={method.id}
-                                                        className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${
-                                                            paymentMethod === method.id
-                                                                ? 'border-brand-primary/50 bg-brand-primary/5'
-                                                                : 'border-brand-light/10 hover:border-brand-light/20 bg-brand-light/5'
-                                                        }`}
+                                                        className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === method.id
+                                                            ? 'border-brand-primary/50 bg-brand-primary/5'
+                                                            : 'border-brand-light/10 hover:border-brand-light/20 bg-brand-light/5'
+                                                            }`}
                                                     >
                                                         <input
                                                             type="radio"

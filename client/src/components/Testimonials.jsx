@@ -5,7 +5,7 @@ import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 const testimonials = [
     {
         id: 1,
-        name: "Aisha Kapoor",
+        name: "Ranesh",
         text: "The quality of the bracelet I ordered is absolutely stunning. It feels so premium and the packaging was just lovely!",
         location: "Mumbai, India",
         rating: 5
@@ -14,14 +14,14 @@ const testimonials = [
         id: 2,
         name: "Sarah Jenkins",
         text: "Fast shipping and excellent customer service. The charm collection is unique and very well crafted.",
-        location: "London, UK",
+        location: "Chennai, India",
         rating: 5
     },
     {
         id: 3,
-        name: "Priya Sharma",
+        name: "Priya ",
         text: "Better than I expected! The gold plating looks real and hasn't faded even after a month of daily wear.",
-        location: "Delhi, India",
+        location: "Coimbatore, India",
         rating: 4
     }
 ];

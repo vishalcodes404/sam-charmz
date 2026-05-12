@@ -7,7 +7,7 @@ const TrustSection = () => {
         {
             icon: ShieldCheck,
             title: "Secure Payment",
-            desc: "256-bit SSL Encrypted"
+            desc: "Razor Payment Method"
         },
         {
             icon: Award,
@@ -17,12 +17,12 @@ const TrustSection = () => {
         {
             icon: Truck,
             title: "Fast Shipping",
-            desc: "Insured Delivery"
+            desc: "Ship Rockets"
         },
         {
             icon: RefreshCw,
-            title: "Easy Returns",
-            desc: "7-Day Return Policy"
+            title: "Return",
+            desc: "No Return Policy on Our Website"
         }
     ];
 

@@ -28,14 +28,12 @@ const PolicyModal = ({ isOpen, onClose, defaultTab = 'about' }) => {
                     <li><strong>Fast Processing:</strong> All orders are processed within 24 hours of confirmation.</li>
                     <li><strong>Insured Shipping:</strong> We provide fully insured shipping for all our jewelry to ensure it reaches you safely.</li>
                     <li><strong>Delivery Time:</strong> Standard delivery takes 3-5 business days. Express shipping options are available at checkout.</li>
-                    <li><strong>Tracking:</strong> Once shipped, you will receive a tracking number via email/SMS to monitor your package's journey.</li>
+                    <li><strong>Tracking:</strong> Once shipped, you will receive a tracking via order details on website or email with shiprockets</li>
                 </ul>
                 <h3 className="font-serif text-2xl italic mt-8 mb-4 text-brand-light">Returns & Exchanges</h3>
-                <p>We want you to love your purchase. If for any reason you are not completely satisfied, we offer a hassle-free <strong>7-day return policy</strong>.</p>
+                <p>We want you to love your purchase. If for any reason you are not completely satisfied, we offer a hassle-free <strong>No return policy</strong>.</p>
                 <ul className="list-disc pl-5 space-y-2">
-                    <li>Items must be unused and in original packaging with tags intact.</li>
-                    <li>Contact our support team to initiate a return.</li>
-                    <li>Refunds are processed within 48 hours of receiving the returned item.</li>
+                    <li>Contact our support team to Say what's the problem about our product.</li>
                 </ul>
             </div>
         ),
@@ -46,8 +44,8 @@ const PolicyModal = ({ isOpen, onClose, defaultTab = 'about' }) => {
                 <div className="bg-green-50 p-4 border border-green-100 rounded-lg flex items-start gap-3">
                     <Shield className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
                     <div>
-                        <h4 className="font-bold text-green-800 text-sm">SSL Encryption</h4>
-                        <p className="text-green-700 text-sm">Our website is secured with 256-bit SSL encryption. We do not store your credit card details.</p>
+                        <h4 className="font-bold text-green-800 text-sm">Razor payment Method</h4>
+                        <p className="text-green-700 text-sm">Razorpay provides a secure and reliable payment gateway to ensure that your personal and financial information is protected.</p>
                     </div>
                 </div>
                 <h4 className="font-bold mt-6 mb-2 text-brand-light">Accepted Payment Methods</h4>
