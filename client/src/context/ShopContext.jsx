@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect, useState, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { safeLocalStorage } from '../lib/safeStorage';
 
 const ShopContext = createContext();
 
@@ -142,13 +143,13 @@ function getCartKey(userId) {
 function loadCartFromStorage(userId) {
     try {
         const key = getCartKey(userId);
-        const raw = localStorage.getItem(key);
+        const raw = safeLocalStorage.getItem(key);
         if (raw) {
             const parsed = JSON.parse(raw);
             return Array.isArray(parsed) ? parsed : [];
         }
     } catch (e) {
-        console.error('Failed to load cart from localStorage', e);
+        console.error('Failed to load cart from storage', e);
     }
     return [];
 }
@@ -156,9 +157,9 @@ function loadCartFromStorage(userId) {
 function saveCartToStorage(userId, cart) {
     try {
         const key = getCartKey(userId);
-        localStorage.setItem(key, JSON.stringify(cart));
+        safeLocalStorage.setItem(key, JSON.stringify(cart));
     } catch (e) {
-        console.error('Failed to save cart to localStorage', e);
+        console.error('Failed to save cart to storage', e);
     }
 }
 

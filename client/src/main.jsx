@@ -24,13 +24,39 @@ class ErrorBoundary extends React.Component {
     render() {
         if (this.state.hasError) {
             return (
-                <div style={{ padding: '20px', color: 'red', backgroundColor: 'white', height: '100vh', zIndex: 999999, position: 'relative' }}>
-                    <h1>Something went wrong.</h1>
-                    <details style={{ whiteSpace: 'pre-wrap' }}>
-                        {this.state.error && this.state.error.toString()}
-                        <br />
-                        {this.state.errorInfo && this.state.errorInfo.componentStack}
-                    </details>
+                <div style={{
+                    minHeight: '100vh',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: '#0f0f17',
+                    color: '#a0a0b0',
+                    fontFamily: 'system-ui, sans-serif',
+                    padding: '40px 20px',
+                    textAlign: 'center',
+                }}>
+                    <h1 style={{ color: '#D4AF37', fontSize: '24px', marginBottom: '12px', fontWeight: 600 }}>
+                        Sam Charmz
+                    </h1>
+                    <p style={{ marginBottom: '24px', fontSize: '14px' }}>
+                        We're experiencing a temporary issue. Please try refreshing the page.
+                    </p>
+                    <button
+                        onClick={() => window.location.reload()}
+                        style={{
+                            padding: '12px 32px',
+                            backgroundColor: '#D4AF37',
+                            color: '#0f0f17',
+                            border: 'none',
+                            borderRadius: '12px',
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                        }}
+                    >
+                        Refresh Page
+                    </button>
                 </div>
             );
         }

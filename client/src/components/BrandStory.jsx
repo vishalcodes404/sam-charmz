@@ -37,9 +37,6 @@ const BrandStory = () => {
                         <p className="font-sans text-brand-gray leading-relaxed mb-8 font-light">
                             Each collection tells a unique story, inspired by the beauty of the natural world and the strength of the human spirit.
                         </p>
-                        <a href="#" className="inline-block border-b border-brand-primary text-brand-primary pb-1 tracking-widest uppercase text-xs hover:text-brand-light hover:border-brand-light transition-colors">
-                            Read Our Story
-                        </a>
                     </motion.div>
                 </div>
             </div>

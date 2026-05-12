@@ -9,6 +9,7 @@ function ProductModal({ isOpen, onClose, onSave, initial, categoryNames }) {
     const [errors, setErrors] = useState({});
     const fileInputRef = useRef(null);
     const [uploadingSlot, setUploadingSlot] = useState(null);
+    const [uploadingImage, setUploadingImage] = useState(false);
 
     React.useEffect(() => {
         // Backward compat: migrate old `image` string → `images` array
@@ -37,7 +38,7 @@ function ProductModal({ isOpen, onClose, onSave, initial, categoryNames }) {
         }
     };
 
-    const handleFileSelect = (e) => {
+    const handleFileSelect = async (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
@@ -47,30 +48,58 @@ function ProductModal({ isOpen, onClose, onSave, initial, categoryNames }) {
             return;
         }
 
-        // Validate file size (max 2MB per image for localStorage safety)
-        if (file.size > 2 * 1024 * 1024) {
-            setErrors(prev => ({ ...prev, images: 'Image must be under 2MB' }));
+        // Validate file size (max 5MB per image)
+        if (file.size > 5 * 1024 * 1024) {
+            setErrors(prev => ({ ...prev, images: 'Image must be under 5MB' }));
             return;
         }
 
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            const base64 = ev.target.result;
+        setUploadingImage(true);
+
+        try {
+            // Try uploading to Supabase Storage
+            const { supabase } = await import('../../lib/supabaseClient');
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${fileExt}`;
+            const filePath = `products/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('product-images')
+                .upload(filePath, file, { cacheControl: '3600', upsert: false });
+
+            let imageUrl;
+            if (uploadError) {
+                console.warn('Supabase upload failed, using base64 fallback:', uploadError.message);
+                // Fallback to base64
+                imageUrl = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => resolve(ev.target.result);
+                    reader.readAsDataURL(file);
+                });
+            } else {
+                const { data: urlData } = supabase.storage
+                    .from('product-images')
+                    .getPublicUrl(filePath);
+                imageUrl = urlData.publicUrl;
+            }
+
             setForm(prev => {
                 const newImages = [...prev.images];
                 if (uploadingSlot !== null && uploadingSlot < newImages.length) {
-                    // Replace existing slot
-                    newImages[uploadingSlot] = base64;
+                    newImages[uploadingSlot] = imageUrl;
                 } else {
-                    // Add to next available slot
-                    newImages.push(base64);
+                    newImages.push(imageUrl);
                 }
                 return { ...prev, images: newImages.slice(0, MAX_IMAGES) };
             });
             setErrors(prev => { const { images, ...rest } = prev; return rest; });
+        } catch (err) {
+            console.error('Image upload error:', err);
+            setErrors(prev => ({ ...prev, images: 'Failed to upload image. Try again.' }));
+        } finally {
             setUploadingSlot(null);
-        };
-        reader.readAsDataURL(file);
+            setUploadingImage(false);
+        }
 
         // Reset input so same file can be re-selected
         e.target.value = '';
@@ -216,7 +245,7 @@ function ProductModal({ isOpen, onClose, onSave, initial, categoryNames }) {
                             })}
                         </div>
                         {errors.images && <p className="text-red-400 text-xs mt-1.5">{errors.images}</p>}
-                        <p className="text-brand-gray/40 text-[11px] mt-1.5">Upload 1–3 product photos • Max 2MB each • JPG, PNG, WebP</p>
+                        <p className="text-brand-gray/40 text-[11px] mt-1.5">Upload 1–3 product photos • Max 5MB each • JPG, PNG, WebP</p>
                     </div>
 
                     <div className="flex gap-3 pt-2">
@@ -282,7 +311,7 @@ export default function AdminProducts() {
     };
 
     // Helper: get display image (backward compat)
-    const getThumb = (p) => (p.images?.[0] || p.image || '');
+    const getThumb = (p) => (p.images?.[0] || p.image_url || p.image || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjUwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjUwMCIgZmlsbD0iIzFhMWEyZSIvPjx0ZXh0IHg9IjIwMCIgeT0iMjUwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzY2NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==');
 
     return (
         <div className="space-y-6 max-w-6xl">

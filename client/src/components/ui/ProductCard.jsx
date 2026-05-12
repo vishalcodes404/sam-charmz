@@ -4,11 +4,28 @@ import { Plus, Check, Heart } from 'lucide-react';
 import { useShop } from '../../context/ShopContext';
 import { ShinyButton } from './ShinyButton';
 
+const FALLBACK_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjUwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjUwMCIgZmlsbD0iIzFhMWEyZSIvPjx0ZXh0IHg9IjIwMCIgeT0iMjUwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzY2NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
+
+function getProductImage(product) {
+    // Handle images as array, string, or missing
+    if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+        return product.images[0];
+    }
+    if (typeof product.images === 'string' && product.images) {
+        return product.images;
+    }
+    if (product.image_url) return product.image_url;
+    if (product.image) return product.image;
+    return FALLBACK_IMAGE;
+}
+
 const ProductCard = ({ product, onProductClick }) => {
     const { addToCart, toggleWishlist, wishlist } = useShop();
     const isWishlisted = wishlist.some(item => item.id === product.id);
     const [isAdded, setIsAdded] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
+
+    const imageSrc = getProductImage(product);
 
     const handleAddToCart = () => {
         addToCart(product);
@@ -36,10 +53,11 @@ const ProductCard = ({ product, onProductClick }) => {
                 )}
 
                 <img
-                    src={product.images?.[0] || product.image}
+                    src={imageSrc}
                     alt={product.name}
                     loading="lazy"
                     onLoad={() => setImageLoaded(true)}
+                    onError={(e) => { e.target.src = FALLBACK_IMAGE; setImageLoaded(true); }}
                     className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 z-10 relative ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
                 />
 

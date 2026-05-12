@@ -13,7 +13,7 @@ function CategoryModal({ isOpen, onClose, onSave, initial }) {
         setError('');
     }, [initial, isOpen]);
 
-    const handleFileSelect = (e) => {
+    const handleFileSelect = async (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
@@ -22,17 +22,46 @@ function CategoryModal({ isOpen, onClose, onSave, initial }) {
             return;
         }
 
-        if (file.size > 2 * 1024 * 1024) {
-            setError('Image must be under 2MB');
+        if (file.size > 5 * 1024 * 1024) {
+            setError('Image must be under 5MB');
             return;
         }
 
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            setImage(ev.target.result);
-            setError('');
-        };
-        reader.readAsDataURL(file);
+        try {
+            const { supabase } = await import('../../lib/supabaseClient');
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${fileExt}`;
+            const filePath = `categories/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('product-images')
+                .upload(filePath, file, { cacheControl: '3600', upsert: false });
+
+            if (uploadError) {
+                console.warn('Supabase upload failed, using base64 fallback:', uploadError.message);
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    setImage(ev.target.result);
+                    setError('');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                const { data: urlData } = supabase.storage
+                    .from('product-images')
+                    .getPublicUrl(filePath);
+                setImage(urlData.publicUrl);
+                setError('');
+            }
+        } catch (err) {
+            console.error('Category image upload error:', err);
+            // Fallback to base64
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                setImage(ev.target.result);
+                setError('');
+            };
+            reader.readAsDataURL(file);
+        }
 
         if (e.target) e.target.value = '';
     };

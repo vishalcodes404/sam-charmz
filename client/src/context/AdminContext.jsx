@@ -7,11 +7,19 @@ function slugify(name) {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
+// Timeout helper: rejects after ms
+function withTimeout(promise, ms) {
+    return Promise.race([
+        promise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Timed out')), ms)),
+    ]);
+}
+
 export function AdminProvider({ children }) {
     // ─── Admin Auth (Supabase-based) ───
     const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
     const [adminChecking, setAdminChecking] = useState(true);
-    const adminCheckingRef = useRef(false);
+    const adminCheckDoneRef = useRef(false);
     const loginInProgressRef = useRef(false);
 
     // ─── Data State ───
@@ -24,39 +32,56 @@ export function AdminProvider({ children }) {
     // Backward-compat: array of category name strings
     const categoryNames = categories.map(c => c.name);
 
-    // ─── Check admin status on mount ───
+    // ─── Check admin status on mount (ONCE, with timeout safety) ───
     useEffect(() => {
+        // Guard against double-mount in StrictMode
+        if (adminCheckDoneRef.current) return;
+        adminCheckDoneRef.current = true;
+
         const checkAdmin = async () => {
-            // Prevent duplicate checkAdmin calls
-            if (adminCheckingRef.current) return;
-            adminCheckingRef.current = true;
             try {
-                const { data: { session } } = await supabase.auth.getSession();
+                const { data: { session } } = await withTimeout(
+                    supabase.auth.getSession(),
+                    8000 // 8s timeout
+                );
                 if (session?.user) {
-                    const { data: profile } = await supabase
-                        .from('profiles')
-                        .select('is_admin')
-                        .eq('id', session.user.id)
-                        .single();
+                    const { data: profile } = await withTimeout(
+                        supabase
+                            .from('profiles')
+                            .select('is_admin')
+                            .eq('id', session.user.id)
+                            .single(),
+                        6000
+                    );
                     setIsAdminLoggedIn(profile?.is_admin === true);
                 }
+            } catch (err) {
+                console.error('Admin check failed:', err.message);
+                setIsAdminLoggedIn(false);
             } finally {
                 setAdminChecking(false);
             }
         };
         checkAdmin();
 
+        // Auth state listener — skip if login is actively running
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             async (_event, session) => {
-                // Skip if adminLogin is actively running — it handles state itself
                 if (loginInProgressRef.current) return;
                 if (session?.user) {
-                    const { data: profile } = await supabase
-                        .from('profiles')
-                        .select('is_admin')
-                        .eq('id', session.user.id)
-                        .single();
-                    setIsAdminLoggedIn(profile?.is_admin === true);
+                    try {
+                        const { data: profile } = await withTimeout(
+                            supabase
+                                .from('profiles')
+                                .select('is_admin')
+                                .eq('id', session.user.id)
+                                .single(),
+                            6000
+                        );
+                        setIsAdminLoggedIn(profile?.is_admin === true);
+                    } catch {
+                        setIsAdminLoggedIn(false);
+                    }
                 } else {
                     setIsAdminLoggedIn(false);
                 }
@@ -65,32 +90,58 @@ export function AdminProvider({ children }) {
         return () => subscription.unsubscribe();
     }, []);
 
+    // Safety: if adminChecking is still true after 12 seconds, force it to false
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setAdminChecking(prev => {
+                if (prev) {
+                    console.warn('Admin check timed out, unlocking UI.');
+                    return false;
+                }
+                return prev;
+            });
+        }, 12000);
+        return () => clearTimeout(timer);
+    }, []);
+
     // ─── Fetch all data from Supabase ───
     const fetchProducts = useCallback(async () => {
-        const { data, error: err } = await supabase
-            .from('products')
-            .select('*')
-            .order('created_at', { ascending: false });
-        if (err) { setError(err.message); return; }
-        setProducts(data || []);
+        try {
+            const { data, error: err } = await supabase
+                .from('products')
+                .select('*')
+                .order('created_at', { ascending: false });
+            if (err) { setError(err.message); return; }
+            setProducts(data || []);
+        } catch (err) {
+            console.error('Products fetch exception:', err);
+        }
     }, []);
 
     const fetchCategories = useCallback(async () => {
-        const { data, error: err } = await supabase
-            .from('categories')
-            .select('*')
-            .order('created_at', { ascending: true });
-        if (err) { setError(err.message); return; }
-        setCategories(data || []);
+        try {
+            const { data, error: err } = await supabase
+                .from('categories')
+                .select('*')
+                .order('created_at', { ascending: true });
+            if (err) { setError(err.message); return; }
+            setCategories(data || []);
+        } catch (err) {
+            console.error('Categories fetch exception:', err);
+        }
     }, []);
 
     const fetchOrders = useCallback(async () => {
-        const { data, error: err } = await supabase
-            .from('orders')
-            .select('*')
-            .order('created_at', { ascending: false });
-        if (err) { console.error('Orders fetch error:', err.message); return; }
-        setOrders(data || []);
+        try {
+            const { data, error: err } = await supabase
+                .from('orders')
+                .select('*')
+                .order('created_at', { ascending: false });
+            if (err) { console.error('Orders fetch error:', err.message); return; }
+            setOrders(data || []);
+        } catch (err) {
+            console.error('Orders fetch exception:', err);
+        }
     }, []);
 
     // Initial data load
@@ -109,15 +160,21 @@ export function AdminProvider({ children }) {
         if (loginInProgressRef.current) return { success: false, error: 'Login already in progress.' };
         loginInProgressRef.current = true;
         try {
-            const { data, error: authErr } = await supabase.auth.signInWithPassword({ email, password });
+            const { data, error: authErr } = await withTimeout(
+                supabase.auth.signInWithPassword({ email, password }),
+                10000
+            );
             if (authErr) return { success: false, error: authErr.message };
 
             // Check if user has admin privilege
-            const { data: profile, error: profileErr } = await supabase
-                .from('profiles')
-                .select('is_admin')
-                .eq('id', data.user.id)
-                .single();
+            const { data: profile, error: profileErr } = await withTimeout(
+                supabase
+                    .from('profiles')
+                    .select('is_admin')
+                    .eq('id', data.user.id)
+                    .single(),
+                6000
+            );
 
             if (profileErr || !profile?.is_admin) {
                 await supabase.auth.signOut();

@@ -1,11 +1,14 @@
 // Reviews utility — localStorage-based storage for product reviews
 // Key: samcharmz_reviews (array of review objects)
+// Uses safe storage wrapper to prevent crashes in browsers that block storage.
+
+import { safeLocalStorage } from './safeStorage';
 
 const STORAGE_KEY = 'samcharmz_reviews';
 
 function getAllReviews() {
     try {
-        const stored = localStorage.getItem(STORAGE_KEY);
+        const stored = safeLocalStorage.getItem(STORAGE_KEY);
         return stored ? JSON.parse(stored) : [];
     } catch {
         return [];
@@ -13,7 +16,11 @@ function getAllReviews() {
 }
 
 function saveAllReviews(reviews) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(reviews));
+    try {
+        safeLocalStorage.setItem(STORAGE_KEY, JSON.stringify(reviews));
+    } catch {
+        // Silently fail — reviews won't persist if storage unavailable
+    }
 }
 
 /**

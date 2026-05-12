@@ -29,14 +29,15 @@ const Shop = ({ onProductClick, initialCategory, searchTerm = "" }) => {
 
     // Filter Logic
     const filteredProducts = products.filter(product => {
-        const matchesCategory = activeCategory === "All" || product.category === activeCategory;
+        const matchesCategory = activeCategory === "All" ||
+            (product.category || '').toLowerCase() === activeCategory.toLowerCase();
         const price = parseFloat(product.price);
         const matchesPrice = price >= priceRange.min && price <= priceRange.max;
 
         const lowerTerm = searchTerm.toLowerCase();
         const matchesSearch = searchTerm === "" ||
-            product.name.toLowerCase().includes(lowerTerm) ||
-            product.category.toLowerCase().includes(lowerTerm) ||
+            (product.name || '').toLowerCase().includes(lowerTerm) ||
+            (product.category || '').toLowerCase().includes(lowerTerm) ||
             (product.tags && product.tags.some(tag => tag.toLowerCase().includes(lowerTerm)));
 
         return matchesCategory && matchesPrice && matchesSearch;

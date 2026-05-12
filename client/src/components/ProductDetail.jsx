@@ -5,17 +5,23 @@ import { useShop } from '../context/ShopContext';
 import { ShinyButton } from './ui/ShinyButton';
 import ProductReviews from './ProductReviews';
 
+const FALLBACK_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjUwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjUwMCIgZmlsbD0iIzFhMWEyZSIvPjx0ZXh0IHg9IjIwMCIgeT0iMjUwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzY2NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
+
 const ProductDetail = ({ product, onBack }) => {
     const { addToCart, toggleWishlist, wishlist } = useShop();
     const isWishlisted = wishlist.some(item => item.id === product.id);
     const [quantity, setQuantity] = useState(1);
 
     // Multi-image support with backward compat
-    const allImages = product.images && Array.isArray(product.images) && product.images.length > 0
-        ? product.images
-        : product.image ? [product.image] : [];
+    const allImages = (() => {
+        if (product.images && Array.isArray(product.images) && product.images.length > 0) return product.images;
+        if (typeof product.images === 'string' && product.images) return [product.images];
+        if (product.image_url) return [product.image_url];
+        if (product.image) return [product.image];
+        return [FALLBACK_IMAGE];
+    })();
     const [selectedIdx, setSelectedIdx] = useState(0);
-    const selectedImage = allImages[selectedIdx] || allImages[0] || '';
+    const selectedImage = allImages[selectedIdx] || allImages[0] || FALLBACK_IMAGE;
 
     if (!product) return null;
 
@@ -56,6 +62,7 @@ const ProductDetail = ({ product, onBack }) => {
                                 src={selectedImage}
                                 alt={product.name}
                                 className="w-full h-full object-cover"
+                                onError={(e) => { e.target.src = FALLBACK_IMAGE; }}
                             />
                         </motion.div>
                         {/* Thumbnail strip — only shown if more than 1 image */}

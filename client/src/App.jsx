@@ -25,6 +25,7 @@ const ShopPage = lazy(() => import('./pages/ShopPage'));
 const ProductPage = lazy(() => import('./pages/ProductPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 const OrdersPage = lazy(() => import('./pages/OrdersPage'));
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
 
 function App() {
     const navigate = useNavigate();
@@ -58,15 +59,15 @@ function App() {
         setIsPolicyOpen(true);
     };
 
-    // Read products from AdminContext (localStorage), fallback to static data
+    // Read products from AdminContext (Supabase), fallback to empty
     const { products: adminProducts } = useAdmin();
-    const allProducts = adminProducts;
+    const allProducts = adminProducts || [];
 
     const filteredProducts = allProducts.filter(product => {
         const lowerTerm = searchTerm.toLowerCase();
         return (
-            product.name.toLowerCase().includes(lowerTerm) ||
-            product.category.toLowerCase().includes(lowerTerm) ||
+            (product.name || '').toLowerCase().includes(lowerTerm) ||
+            (product.category || '').toLowerCase().includes(lowerTerm) ||
             (product.tags && product.tags.some(tag => tag.toLowerCase().includes(lowerTerm)))
         );
     });
@@ -86,6 +87,23 @@ function App() {
                     <Suspense fallback={<div className="h-screen w-full flex items-center justify-center tracking-widest uppercase font-sans text-xs text-brand-gray">Loading...</div>}>
                         <Routes>
                             <Route path="/admin/*" element={<AdminPage />} />
+                        </Routes>
+                    </Suspense>
+                </div>
+            </div>
+        );
+    }
+
+    // Reset password page — minimal chrome
+    if (location.pathname === '/reset-password') {
+        return (
+            <div className="relative min-h-screen text-brand-light bg-brand-dark overflow-x-hidden">
+                <Preloader />
+                <SlowBackground />
+                <div className="relative z-10 flex flex-col min-h-screen">
+                    <Suspense fallback={<div className="h-screen w-full flex items-center justify-center tracking-widest uppercase font-sans text-xs text-brand-gray">Loading...</div>}>
+                        <Routes>
+                            <Route path="/reset-password" element={<ResetPasswordPage />} />
                         </Routes>
                     </Suspense>
                 </div>
@@ -139,6 +157,7 @@ function App() {
                         <Routes>
                             <Route path="/" element={<HomePage searchTerm={searchTerm} filteredProducts={filteredProducts} />} />
                             <Route path="/shop" element={<ShopPage searchTerm={searchTerm} />} />
+                            <Route path="/collections" element={<ShopPage searchTerm={searchTerm} />} />
                             <Route path="/product/:id" element={<ProductPage />} />
                             <Route path="/orders" element={<OrdersPage />} />
                         </Routes>

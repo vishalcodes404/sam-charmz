@@ -21,7 +21,7 @@ const ProductGrid = ({ products, isSearching, onProductClick, onViewAll, disable
         ? products
         : activeCategory === "All"
             ? products
-            : products.filter(p => p.category === activeCategory);
+            : products.filter(p => (p.category || '').toLowerCase() === activeCategory.toLowerCase());
 
     // Apply sorting
     const sortedProducts = [...categoryFiltered].sort((a, b) => {
